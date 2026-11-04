@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Results</title>
+<meta name="description" content="Every pick posted, graded automatically. Nothing deleted.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@500;700&family=Public+Sans:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0f1b2d;
+    --panel: #15253b;
+    --line: #24384f;
+    --gold: #f2b33d;
+    --win: #45c486;
+    --loss: #ef6a61;
+    --text: #e8edf3;
+    --muted: #93a4b8;
+    --num: "Saira Condensed", "Arial Narrow", sans-serif;
+    --body: "Public Sans", system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html { background: var(--ink); }
+  body { margin: 0; background: var(--ink); color: var(--text); font: 16px/1.55 var(--body); }
+  main { max-width: 860px; margin: 0 auto; padding: 40px 16px 64px; }
+  a { color: var(--gold); }
+  :focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+
+  header h1 { font: 700 2.25rem/1.1 var(--num); letter-spacing: .01em; margin: 0 0 6px; }
+  header p { margin: 0; color: var(--muted); max-width: 60ch; }
+
+  /* the scoreboard: the one loud thing on the page */
+  .board { margin: 28px 0 8px; background: #0a1422; border: 1px solid var(--line); border-radius: 14px;
+           padding: 22px 24px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px 24px; }
+  .board div { min-width: 0; }
+  .board b { display: block; font: 700 clamp(2.6rem, 9vw, 4.4rem)/1 var(--num); color: var(--gold);
+             font-variant-numeric: tabular-nums; text-shadow: 0 0 18px rgba(242,179,61,.28); }
+  .board span { color: var(--muted); font-size: .9rem; }
+  .board b.neg { color: var(--loss); text-shadow: none; }
+  .meta { color: var(--muted); font-size: .85rem; margin: 0 0 32px; }
+
+  h2 { font: 700 1.45rem/1.2 var(--num); margin: 40px 0 12px; }
+  .chart { background: var(--panel); border-radius: 10px; padding: 14px 12px 6px; }
+  .chart svg { display: block; width: 100%; height: 190px; }
+
+  table.split { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+  .split th, .split td { text-align: left; padding: 9px 4px; border-bottom: 1px solid var(--line); }
+  .split th { color: var(--muted); font-weight: 600; font-size: .85rem; }
+  .split td:not(:first-child), .split th:not(:first-child) { text-align: right; }
+
+  .filters { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 14px; }
+  .filters button { font: 600 .85rem var(--body); color: var(--text); background: transparent;
+                    border: 1px solid var(--line); border-radius: 999px; padding: 6px 14px; cursor: pointer; }
+  .filters button[aria-pressed="true"] { background: var(--gold); border-color: var(--gold); color: var(--ink); }
+
+  ol.ledger { list-style: none; margin: 0; padding: 0; }
+  .bet { display: grid; grid-template-columns: 44px 1fr auto; gap: 4px 14px; align-items: start;
+         padding: 14px 0; border-bottom: 1px solid var(--line); }
+  .stamp { font: 700 1.15rem/1 var(--num); width: 40px; height: 40px; border-radius: 8px; display: grid;
+           place-items: center; border: 2px solid currentColor; transform: rotate(-4deg); }
+  .win .stamp { color: var(--win); } .loss .stamp { color: var(--loss); } .push .stamp { color: var(--muted); }
+  .what { font-weight: 600; }
+  .sub { color: var(--muted); font-size: .85rem; }
+  .u { font: 700 1.3rem/1.2 var(--num); font-variant-numeric: tabular-nums; text-align: right; }
+  .win .u { color: var(--win); } .loss .u { color: var(--loss); } .push .u { color: var(--muted); }
+  .empty { background: var(--panel); border-radius: 10px; padding: 22px; color: var(--muted); }
+  footer { margin-top: 48px; color: var(--muted); font-size: .8rem; max-width: 70ch; }
+
+  @media (max-width: 560px) {
+    .board { grid-template-columns: 1fr 1fr; padding: 18px; }
+    .board div:first-child { grid-column: 1 / -1; }
+    .bet { grid-template-columns: 40px 1fr; }
+    .u { grid-column: 2; text-align: left; }
+  }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1 id="name">Results</h1>
+    <p>Every pick we've posted, graded automatically when the game ends. Wins and losses both stay up. Nothing gets deleted.</p>
+  </header>
+
+  <section class="board" aria-label="Overall record">
+    <div><b id="rec">0-0</b><span>Record (wins-losses)</span></div>
+    <div><b id="units">+0.0u</b><span>Units won</span></div>
+    <div><b id="roi">n/a</b><span>Return per unit bet</span></div>
+  </section>
+  <p class="meta" id="meta"></p>
+
+  <section id="results-body" hidden>
+    <h2>Units over time</h2>
+    <div class="chart"><svg id="chart" viewBox="0 0 800 190" preserveAspectRatio="none" role="img" aria-label="Running units won"></svg></div>
+
+    <h2>By bet type</h2>
+    <table class="split">
+      <thead><tr><th scope="col">Bet type</th><th scope="col">Record</th><th scope="col">Win rate</th><th scope="col">Units</th></tr></thead>
+      <tbody id="split"></tbody>
+    </table>
+
+    <h2>Every pick</h2>
+    <div class="filters" id="filters" role="group" aria-label="Show bet type"></div>
+    <ol class="ledger" id="ledger"></ol>
+  </section>
+
+  <p class="empty" id="empty" hidden></p>
+
+  <footer>
+    A unit is whatever amount you choose to bet; results are shown in units so they apply to any bankroll.
+    Each pick shows when it was posted and when the game started. Past results don't guarantee future results.
+    For entertainment only, not financial advice. 21+ where legal. Need help? 1-800-GAMBLER.
+  </footer>
+</main>
+<script>
+const fmtU = u => (u >= 0 ? "+" : "−") + Math.abs(u).toFixed(1) + "u";
+const dt = s => new Date(s);
+const day = d => d.toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" });
+const time = d => d.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" });
+const label = b => b.type === "Value" ? `${b.sport} value` : b.type;
+
+function render(data) {
+  document.title = `${data.name} · Results`;
+  document.getElementById("name").textContent = data.name;
+  const r = data.record;
+  document.getElementById("rec").textContent = `${r.wins}-${r.losses}` + (r.pushes ? `-${r.pushes}` : "");
+  const u = document.getElementById("units");
+  u.textContent = fmtU(r.units); u.classList.toggle("neg", r.units < 0);
+  const roi = document.getElementById("roi");
+  roi.textContent = r.roi == null ? "n/a" : (r.roi >= 0 ? "+" : "−") + Math.abs(r.roi * 100).toFixed(1) + "%";
+  roi.classList.toggle("neg", r.roi != null && r.roi < 0);
+  document.getElementById("meta").textContent =
+    `Tracking since ${day(dt(data.since + "T12:00:00"))}. Updated ${day(dt(data.updated))} at ${time(dt(data.updated))}.`;
+
+  const bets = data.bets;
+  if (!bets.length) {
+    const e = document.getElementById("empty");
+    e.textContent = "No finished picks yet. Results show up here the night each game ends.";
+    e.hidden = false; return;
+  }
+  document.getElementById("results-body").hidden = false;
+
+  // running units chart
+  let run = 0; const pts = [0, ...bets.map(b => (run += b.units))];
+  const lo = Math.min(0, ...pts), hi = Math.max(0, ...pts), span = (hi - lo) || 1;
+  const x = i => (i / (pts.length - 1)) * 790 + 5, y = v => 180 - ((v - lo) / span) * 170;
+  const path = pts.map((v, i) => `${i ? "L" : "M"}${x(i).toFixed(1)},${y(v).toFixed(1)}`).join("");
+  document.getElementById("chart").innerHTML =
+    `<line x1="0" x2="800" y1="${y(0)}" y2="${y(0)}" stroke="#24384f" stroke-dasharray="4 5"/>` +
+    `<path d="${path}" fill="none" stroke="${run >= 0 ? "#f2b33d" : "#ef6a61"}" stroke-width="3" vector-effect="non-scaling-stroke" stroke-linejoin="round"/>`;
+
+  // by type
+  const groups = {};
+  for (const b of bets) (groups[label(b)] ??= []).push(b);
+  document.getElementById("split").innerHTML = Object.entries(groups).map(([k, g]) => {
+    const w = g.filter(b => b.result === "win").length, l = g.filter(b => b.result === "loss").length;
+    const units = g.reduce((s, b) => s + b.units, 0);
+    return `<tr><td>${k}</td><td>${w}-${l}</td><td>${w + l ? Math.round(w / (w + l) * 100) + "%" : "n/a"}</td><td>${fmtU(units)}</td></tr>`;
+  }).join("");
+
+  // ledger with filters
+  const types = ["All", ...Object.keys(groups)];
+  const f = document.getElementById("filters");
+  f.innerHTML = types.map((t, i) => `<button type="button" aria-pressed="${i === 0}">${t}</button>`).join("");
+  const draw = t => {
+    document.getElementById("ledger").innerHTML = bets.filter(b => t === "All" || label(b) === t).reverse().map(b => {
+      const s = dt(b.start), p = dt(b.posted);
+      return `<li class="bet ${b.result}">
+        <span class="stamp" aria-label="${b.result}">${b.result === "win" ? "W" : b.result === "loss" ? "L" : "P"}</span>
+        <div><div class="what">${b.bet}</div>
+          <div class="sub">${b.game} · final ${b.final} · ${b.book} · ${b.stake === 1 ? "1 unit" : b.stake + " units"}</div>
+          <div class="sub">Posted ${day(p)} ${time(p)}, game started ${time(s)}</div></div>
+        <div class="u">${fmtU(b.units)}</div></li>`;
+    }).join("");
+  };
+  f.addEventListener("click", e => {
+    if (e.target.tagName !== "BUTTON") return;
+    f.querySelectorAll("button").forEach(btn => btn.setAttribute("aria-pressed", btn === e.target));
+    draw(e.target.textContent);
+  });
+  draw("All");
+}
+
+fetch("results.json", { cache: "no-store" }).then(r => r.json()).then(render).catch(() => {
+  const e = document.getElementById("empty");
+  e.textContent = "Results couldn't load. Refresh the page in a minute.";
+  e.hidden = false;
+});
+</script>
+</body>
+</html>
