@@ -32,15 +32,21 @@
   header p { margin: 0; color: var(--muted); max-width: 60ch; }
 
   /* the scoreboard: the one loud thing on the page */
-  .board { margin: 28px 0 8px; background: #0a1422; border: 1px solid var(--line); border-radius: 14px;
+  .board { margin: 20px 0 8px; background: #0a1422; border: 1px solid var(--line); border-radius: 14px;
            padding: 22px 24px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px 24px; }
   .board div { min-width: 0; }
   .board b { display: block; font: 700 clamp(2.6rem, 9vw, 4.4rem)/1 var(--num); color: var(--gold);
              font-variant-numeric: tabular-nums; text-shadow: 0 0 18px rgba(242,179,61,.28); }
   .board span { color: var(--muted); font-size: .9rem; }
   .board b.neg { color: var(--loss); text-shadow: none; }
-  .meta { color: var(--muted); font-size: .85rem; margin: 0 0 32px; }
+  .meta { color: var(--muted); font-size: .85rem; margin: 0 0 18px; }
 
+  .tabs { display: flex; gap: 4px; margin: 28px 0 10px; border-bottom: 1px solid var(--line); }
+  .tabs button { font: 700 1.2rem var(--num); color: var(--muted); background: none; border: 0;
+                 border-bottom: 3px solid transparent; padding: 8px 14px 10px; cursor: pointer; }
+  .tabs button[aria-selected="true"] { color: var(--text); border-bottom-color: var(--gold); }
+  .lede { margin: 0 0 4px; color: var(--muted); max-width: 62ch; }
+  .note { color: var(--muted); font-size: .85rem; margin: 8px 0 0; }
   h2 { font: 700 1.45rem/1.2 var(--num); margin: 40px 0 12px; }
   .chart { background: var(--panel); border-radius: 10px; padding: 14px 12px 6px; }
   .chart svg { display: block; width: 100%; height: 190px; }
@@ -80,32 +86,23 @@
 <main>
   <header>
     <h1 id="name">Results</h1>
-    <p>Every pick we've posted, graded automatically when the game ends. Wins and losses both stay up. Nothing gets deleted.</p>
   </header>
 
-  <section class="board" aria-label="Overall record">
-    <div><b id="rec">0-0</b><span>Record (wins-losses)</span></div>
-    <div><b id="units">+0.0u</b><span>Units won</span></div>
-    <div><b id="roi">n/a</b><span>Return per unit bet</span></div>
-  </section>
+  <nav class="tabs" role="tablist" aria-label="Results">
+    <button role="tab" id="tab-proven" aria-selected="true" aria-controls="proven">Proven</button>
+    <button role="tab" id="tab-testing" aria-selected="false" aria-controls="testing">Testing</button>
+  </nav>
   <p class="meta" id="meta"></p>
 
-  <section id="results-body" hidden>
-    <h2>Units over time</h2>
-    <div class="chart"><svg id="chart" viewBox="0 0 800 190" preserveAspectRatio="none" role="img" aria-label="Running units won"></svg></div>
-
-    <h2>By bet type</h2>
-    <table class="split">
-      <thead><tr><th scope="col">Bet type</th><th scope="col">Record</th><th scope="col">Win rate</th><th scope="col">Units</th></tr></thead>
-      <tbody id="split"></tbody>
-    </table>
-
-    <h2>Every pick</h2>
-    <div class="filters" id="filters" role="group" aria-label="Show bet type"></div>
-    <ol class="ledger" id="ledger"></ol>
+  <section id="proven" role="tabpanel" aria-labelledby="tab-proven">
+    <p class="lede">Every pick sent to members, graded when the game ends. Wins and losses both stay up. Nothing gets deleted.</p>
+    <div class="panel"></div>
   </section>
 
-  <p class="empty" id="empty" hidden></p>
+  <section id="testing" role="tabpanel" aria-labelledby="tab-testing" hidden>
+    <p class="lede">Bet types we're still testing. These are tracked here but not sent to members. When one proves itself, it moves to Proven.</p>
+    <div class="panel"></div>
+  </section>
 
   <footer>
     A unit is whatever amount you choose to bet; results are shown in units so they apply to any bankroll.
@@ -118,58 +115,48 @@ const fmtU = u => (u >= 0 ? "+" : "−") + Math.abs(u).toFixed(1) + "u";
 const dt = s => new Date(s);
 const day = d => d.toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" });
 const time = d => d.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" });
-const label = b => b.type === "Value" ? `${b.sport} value` : b.type;
+const pct = r => (r >= 0 ? "+" : "−") + Math.abs(r * 100).toFixed(1) + "%";
+const esc = t => String(t).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const wl = g => [g.filter(b => b.result === "win").length, g.filter(b => b.result === "loss").length];
 
-function render(data) {
-  document.title = `${data.name} · Results`;
-  document.getElementById("name").textContent = data.name;
-  const r = data.record;
-  document.getElementById("rec").textContent = `${r.wins}-${r.losses}` + (r.pushes ? `-${r.pushes}` : "");
-  const u = document.getElementById("units");
-  u.textContent = fmtU(r.units); u.classList.toggle("neg", r.units < 0);
-  const roi = document.getElementById("roi");
-  roi.textContent = r.roi == null ? "n/a" : (r.roi >= 0 ? "+" : "−") + Math.abs(r.roi * 100).toFixed(1) + "%";
-  roi.classList.toggle("neg", r.roi != null && r.roi < 0);
-  document.getElementById("meta").textContent =
-    `Tracking since ${day(dt(data.since + "T12:00:00"))}. Updated ${day(dt(data.updated))} at ${time(dt(data.updated))}.`;
-
-  const bets = data.bets;
-  if (!bets.length) {
-    const e = document.getElementById("empty");
-    e.textContent = "No finished picks yet. Results show up here the night each game ends.";
-    e.hidden = false; return;
-  }
-  document.getElementById("results-body").hidden = false;
-
-  // running units chart
+function panel(el, tab, tested, emptyText) {
+  const bets = tab.bets, r = tab.record;
+  if (!bets.length) { el.innerHTML = `<p class="empty">${emptyText}</p>`; return; }
   let run = 0; const pts = [0, ...bets.map(b => (run += b.units))];
   const lo = Math.min(0, ...pts), hi = Math.max(0, ...pts), span = (hi - lo) || 1;
   const x = i => (i / (pts.length - 1)) * 790 + 5, y = v => 180 - ((v - lo) / span) * 170;
   const path = pts.map((v, i) => `${i ? "L" : "M"}${x(i).toFixed(1)},${y(v).toFixed(1)}`).join("");
-  document.getElementById("chart").innerHTML =
-    `<line x1="0" x2="800" y1="${y(0)}" y2="${y(0)}" stroke="#24384f" stroke-dasharray="4 5"/>` +
-    `<path d="${path}" fill="none" stroke="${run >= 0 ? "#f2b33d" : "#ef6a61"}" stroke-width="3" vector-effect="non-scaling-stroke" stroke-linejoin="round"/>`;
-
-  // by type
   const groups = {};
-  for (const b of bets) (groups[label(b)] ??= []).push(b);
-  document.getElementById("split").innerHTML = Object.entries(groups).map(([k, g]) => {
-    const w = g.filter(b => b.result === "win").length, l = g.filter(b => b.result === "loss").length;
-    const units = g.reduce((s, b) => s + b.units, 0);
-    return `<tr><td>${k}</td><td>${w}-${l}</td><td>${w + l ? Math.round(w / (w + l) * 100) + "%" : "n/a"}</td><td>${fmtU(units)}</td></tr>`;
+  for (const b of bets) (groups[b.group] ??= []).push(b);
+  const rows = Object.entries(groups).map(([k, g]) => {
+    const [w, l] = wl(g), u = g.reduce((s, b) => s + b.units, 0);
+    return `<tr><td>${esc(k)}</td><td>${w}-${l}</td><td>${w + l ? Math.round(w / (w + l) * 100) + "%" : "n/a"}</td><td>${fmtU(u)}</td></tr>`;
   }).join("");
-
-  // ledger with filters
-  const types = ["All", ...Object.keys(groups)];
-  const f = document.getElementById("filters");
-  f.innerHTML = types.map((t, i) => `<button type="button" aria-pressed="${i === 0}">${t}</button>`).join("");
+  const notes = Object.entries(tested || {}).map(([k, t]) =>
+    `<p class="note">${esc(k)} went live after testing at ${t.wins}-${t.losses} (${fmtU(t.units)}). That testing record isn't counted in the totals above.</p>`).join("");
+  el.innerHTML = `
+    <div class="board"><div><b>${r.wins}-${r.losses}${r.pushes ? "-" + r.pushes : ""}</b><span>Record (wins-losses)</span></div>
+      <div><b class="${r.units < 0 ? "neg" : ""}">${fmtU(r.units)}</b><span>Units won</span></div>
+      <div><b class="${r.roi < 0 ? "neg" : ""}">${r.roi == null ? "n/a" : pct(r.roi)}</b><span>Return per unit bet</span></div></div>
+    <h2>Units over time</h2>
+    <div class="chart"><svg viewBox="0 0 800 190" preserveAspectRatio="none" role="img" aria-label="Running units won">
+      <line x1="0" x2="800" y1="${y(0)}" y2="${y(0)}" stroke="#24384f" stroke-dasharray="4 5"/>
+      <path d="${path}" fill="none" stroke="${run >= 0 ? "#f2b33d" : "#ef6a61"}" stroke-width="3" vector-effect="non-scaling-stroke" stroke-linejoin="round"/></svg></div>
+    <h2>By bet type</h2>
+    <table class="split"><thead><tr><th scope="col">Bet type</th><th scope="col">Record</th><th scope="col">Win rate</th><th scope="col">Units</th></tr></thead>
+      <tbody>${rows}</tbody></table>${notes}
+    <h2>Every pick</h2>
+    <div class="filters" role="group" aria-label="Show bet type">${["All", ...Object.keys(groups)].map((t, i) =>
+      `<button type="button" aria-pressed="${i === 0}">${esc(t)}</button>`).join("")}</div>
+    <ol class="ledger"></ol>`;
+  const f = el.querySelector(".filters"), ledger = el.querySelector(".ledger");
   const draw = t => {
-    document.getElementById("ledger").innerHTML = bets.filter(b => t === "All" || label(b) === t).reverse().map(b => {
+    ledger.innerHTML = bets.filter(b => t === "All" || b.group === t).slice().reverse().map(b => {
       const s = dt(b.start), p = dt(b.posted);
       return `<li class="bet ${b.result}">
         <span class="stamp" aria-label="${b.result}">${b.result === "win" ? "W" : b.result === "loss" ? "L" : "P"}</span>
-        <div><div class="what">${b.bet}</div>
-          <div class="sub">${b.game} · final ${b.final} · ${b.book} · ${b.stake === 1 ? "1 unit" : b.stake + " units"}</div>
+        <div><div class="what">${esc(b.bet)}</div>
+          <div class="sub">${esc(b.game)}, final ${esc(b.final)}. ${esc(b.book)}, ${b.stake === 1 ? "1 unit" : b.stake + " units"}</div>
           <div class="sub">Posted ${day(p)} ${time(p)}, game started ${time(s)}</div></div>
         <div class="u">${fmtU(b.units)}</div></li>`;
     }).join("");
@@ -182,10 +169,28 @@ function render(data) {
   draw("All");
 }
 
+function render(data) {
+  document.title = `${data.name} · Results`;
+  document.getElementById("name").textContent = data.name;
+  const since = day(dt(data.since + "T12:00:00"));
+  document.getElementById("meta").textContent =
+    `Tracking since ${since}. Updated ${day(dt(data.updated))} at ${time(dt(data.updated))}.`;
+  panel(document.querySelector("#proven .panel"), data.proven, data.proven.tested,
+    `Tracking started ${since}. Results show up here the night each game ends.`);
+  panel(document.querySelector("#testing .panel"), data.testing, null,
+    `Nothing finished in testing yet. Results show up here the night each game ends.`);
+}
+
+const tabs = document.querySelectorAll('[role="tab"]');
+tabs.forEach(t => t.addEventListener("click", () => {
+  tabs.forEach(o => {
+    o.setAttribute("aria-selected", o === t);
+    document.getElementById(o.getAttribute("aria-controls")).hidden = o !== t;
+  });
+}));
+
 fetch("results.json", { cache: "no-store" }).then(r => r.json()).then(render).catch(() => {
-  const e = document.getElementById("empty");
-  e.textContent = "Results couldn't load. Refresh the page in a minute.";
-  e.hidden = false;
+  document.getElementById("meta").textContent = "Results couldn't load. Refresh the page in a minute.";
 });
 </script>
 </body>
