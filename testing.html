@@ -112,6 +112,26 @@
   .pending .pill { color: #8a5a00; background: #fdf3dc; } .pending .u { color: var(--muted); }
   .note { color: var(--muted); font-size: .78rem; margin-top: 4px; grid-column: 1 / -1; }
   .slip .sub { grid-column: 1 / -1; }
+  /* v112: by-type list fits an iPhone (two lines per type) and spreads out on a Mac (one line) */
+  .tlist .trow { display: grid; grid-template-columns: minmax(0, 1fr) 76px 70px 72px 66px; gap: 10px; align-items: baseline;
+                 padding: 11px 2px; border-bottom: 1px solid var(--line); }
+  .tlist .trow:last-child { border-bottom: 0; }
+  .tlist .head { color: var(--muted); font-size: .78rem; font-weight: 600; padding-top: 0; }
+  .tlist .nm { font-weight: 600; overflow-wrap: anywhere; }
+  .tlist .n { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .tlist .n small { display: none; }
+  .tlist .n.pos { color: var(--win); font-weight: 700; } .tlist .n.neg { color: var(--loss); font-weight: 700; }
+  main, .card { min-width: 0; }
+  .slip { grid-template-columns: minmax(0, 1fr) auto; } .slip .what, .note, .slip .sub { overflow-wrap: anywhere; }
+  .prog .row { flex-wrap: wrap; }
+  @media (min-width: 760px) { .prog { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 560px) {
+    .tlist .head { display: none; }
+    .tlist .trow { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 2px 8px; padding: 12px 2px; }
+    .tlist .nm { grid-column: 1 / -1; font-weight: 700; margin-bottom: 4px; }
+    .tlist .n { text-align: left; font-weight: 600; }
+    .tlist .n small { display: block; color: var(--muted); font-size: .68rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; }
+  }
   [hidden] { display: none !important; }
   .adminbar { margin: 0 0 6px; font-size: .8rem; font-weight: 700; color: #8a5a00; background: #fdf3dc; padding: 8px 12px; border-radius: 10px; }
   .private { display: inline-block; font-size: .72rem; font-weight: 800; color: var(--loss); background: var(--loss-soft); padding: 3px 9px; border-radius: 999px; }
@@ -161,17 +181,18 @@ function draw() {
   const bets = DATA.bets.filter(b => LEAGUE === "All" || b.sport === LEAGUE);
   const groups = {};
   for (const b of bets) (groups[b.group] ??= []).push(b);
+  const cell = (lab, val, cls = "") => `<span class="n ${cls}"><small>${lab}</small>${val}</span>`;
   const rows = Object.entries(groups).map(([k, g]) => {
     const w = g.filter(b => b.result === "win").length, l = g.filter(b => b.result === "loss").length;
     const p = g.filter(b => b.result === "pending").length, u = g.reduce((s, b) => s + b.units, 0);
-    return `<tr><td>${esc(k)}</td><td>${w}-${l}</td><td>${w + l ? Math.round(w / (w + l) * 100) + "%" : "n/a"}</td>` +
-           `<td class="${u > 0 ? "pos" : u < 0 ? "neg" : ""}">${fmtU(u)}</td><td>${p}</td></tr>`;
-  }).join("");
+    return { u, html: `<div class="trow"><span class="nm">${esc(k)}</span>${cell("Record", `${w}-${l}`)}` +
+      `${cell("Win rate", w + l ? Math.round(w / (w + l) * 100) + "%" : "n/a")}${cell("Units", fmtU(u), u > 0 ? "pos" : u < 0 ? "neg" : "")}${cell("Pending", p)}</div>` };
+  }).sort((a, b) => b.u - a.u).map(r => r.html).join("");   // best first
   $("view").innerHTML = `
     <section class="card"><h2>Proving progress</h2><div class="prog">${DATA.progress.map(p =>
       `<div class="row"><b>${esc(p.name)}<span class="state ${esc(p.state)}">${p.state === "SENDING" ? "SENDING" : "TESTING"}</span></b><span>${esc(p.detail)}</span></div>`).join("")}</div></section>
     <section class="card" style="margin-top:14px"><h2>By type (tracked silently)</h2>
-      ${rows ? `<table class="split"><thead><tr><th scope="col">Type</th><th scope="col">Record</th><th scope="col">Win rate</th><th scope="col">Units</th><th scope="col">Pending</th></tr></thead><tbody>${rows}</tbody></table>`
+      ${rows ? `<div class="tlist" role="table" aria-label="By type"><div class="trow head"><span class="nm">Type</span><span class="n">Record</span><span class="n">Win rate</span><span class="n">Units</span><span class="n">Pending</span></div>${rows}</div>`
              : `<p class="empty">Nothing tracked yet. Silent picks show up here the moment the bot saves them.</p>`}</section>
     <section class="card" style="margin-top:14px"><h2>Every tracked pick</h2><ol class="ledger">${bets.map(b => {
       const s = dt(b.start);
