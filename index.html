@@ -5,161 +5,120 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Book Buster</title>
 <meta name="description" content="Every pick posted, graded automatically. Nothing deleted.">
-<meta name="theme-color" content="#1e1f22">
+<meta name="theme-color" content="#0a1422">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@500;700&family=Public+Sans:wght@400;600&display=swap" rel="stylesheet">
 <style>
-  /* Look borrowed loosely from the Discord server: gray panels, channel-style rows, money green and gold */
+  /* top bar: the one title on every page */
+  .sitenav { position: sticky; top: 0; z-index: 20; background: #0a1422; border-bottom: 1px solid #24384f; }
+  .sitenav .in { max-width: 860px; margin: 0 auto; padding: 0 16px; display: flex; align-items: center; gap: 2px; height: 54px; }
+  .sitenav .brand { font: 700 1.3rem/1 "Saira Condensed", "Arial Narrow", sans-serif; color: #e8edf3; text-decoration: none;
+                    margin-right: auto; white-space: nowrap; letter-spacing: .01em; display: block; }
+  .sitenav .brand b { color: #f2b33d; }
+  .sitenav .tab { color: #93a4b8; text-decoration: none; font: 600 .92rem/1 "Public Sans", system-ui, sans-serif;
+                  padding: 18px 9px 15px; border-bottom: 3px solid transparent; white-space: nowrap; }
+  .sitenav .tab:hover { color: #e8edf3; }
+  .sitenav .tab[aria-current="page"] { color: #e8edf3; border-bottom-color: #f2b33d; }
+  .sitenav .login { margin-left: 8px; font: 600 .85rem/1 "Public Sans", system-ui, sans-serif; color: #0f1b2d; background: #f2b33d;
+                    text-decoration: none; padding: 9px 12px; border-radius: 999px; white-space: nowrap; }
+  .sitenav .login.out { background: transparent; color: #e8edf3; box-shadow: inset 0 0 0 1px #3a516c; }
+  .sitenav a:focus-visible { outline: 2px solid #f2b33d; outline-offset: 2px; }
+  @media (max-width: 400px) { .sitenav .brand { font-size: 1.12rem; } .sitenav .tab { padding-left: 6px; padding-right: 6px; font-size: .86rem; } }
   :root {
-    --deep: #1e1f22; --side: #2b2d31; --bg: #313338; --row: #35373c; --sel: #404249; --line: #3f4147;
-    --text: #dbdee1; --head: #f2f3f5; --muted: #949ba4;
-    --green: #23a55a; --gold: #f0b232; --loss: #f23f43;
-    --font: "Noto Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --ink: #0f1b2d; --panel: #15253b; --line: #24384f; --gold: #f2b33d; --win: #45c486; --loss: #ef6a61;
+    --text: #e8edf3; --muted: #93a4b8;
+    --num: "Saira Condensed", "Arial Narrow", sans-serif; --body: "Public Sans", system-ui, sans-serif;
   }
   * { box-sizing: border-box; }
-  html, body { background: var(--bg); }
-  body { margin: 0; color: var(--text); font: 15px/1.5 var(--font); -webkit-font-smoothing: antialiased; }
-  [hidden] { display: none !important; }
+  html { background: var(--ink); }
+  body { margin: 0; background: var(--ink); color: var(--text); font: 16px/1.55 var(--body); }
+  main { max-width: 860px; margin: 0 auto; padding: 8px 16px 64px; }
+  a { color: var(--gold); }
   :focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
   .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
-  /* top bar: the one title on the page */
-  .sitenav { position: sticky; top: 0; z-index: 20; background: var(--deep); border-bottom: 1px solid #111214; }
-  .sitenav .in { max-width: 1040px; margin: 0 auto; padding: 0 16px; height: 56px; display: flex; align-items: center; gap: 6px; }
-  .brand { display: flex; align-items: center; gap: 10px; margin-right: auto; color: var(--head); text-decoration: none;
-           font-weight: 800; font-size: 1.12rem; white-space: nowrap; }
-  .brand svg { flex: none; }
-  .sitenav .tab { color: var(--muted); text-decoration: none; font-weight: 600; font-size: .92rem; padding: 7px 12px;
-                  border-radius: 6px; white-space: nowrap; }
-  .sitenav .tab:hover { background: var(--row); color: var(--text); }
-  .sitenav .tab[aria-current="page"] { background: var(--sel); color: var(--head); }
+  /* the scoreboard: the one loud thing on the page */
+  .board { margin: 20px 0 8px; background: #0a1422; border: 1px solid var(--line); border-radius: 14px;
+           padding: 22px 24px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px 24px; }
+  .board div { min-width: 0; }
+  .board b { display: block; font: 700 clamp(2.6rem, 9vw, 4.4rem)/1 var(--num); color: var(--gold);
+             font-variant-numeric: tabular-nums; text-shadow: 0 0 18px rgba(242,179,61,.28); }
+  .board span { color: var(--muted); font-size: .9rem; }
+  .board b.neg { color: var(--loss); text-shadow: none; }
+  .meta { color: var(--muted); font-size: .85rem; margin: 0 0 18px; }
 
-  .layout { max-width: 1040px; margin: 0 auto; display: grid; grid-template-columns: 220px 1fr; min-height: calc(100vh - 56px); }
+  .tabs { display: flex; gap: 4px; margin: 14px 0 10px; border-bottom: 1px solid var(--line); }
+  .tabs button { font: 700 1.2rem var(--num); color: var(--muted); background: none; border: 0;
+                 border-bottom: 3px solid transparent; padding: 8px 14px 10px; cursor: pointer; }
+  .tabs button[aria-selected="true"] { color: var(--text); border-bottom-color: var(--gold); }
+  .lede { margin: 0 0 4px; color: var(--muted); max-width: 62ch; }
+  .note { color: var(--muted); font-size: .85rem; margin: 8px 0 0; }
+  h2 { font: 700 1.45rem/1.2 var(--num); margin: 40px 0 12px; }
+  .chart { background: var(--panel); border-radius: 10px; padding: 14px 12px 6px; }
+  .chart svg { display: block; width: 100%; height: 190px; }
 
-  /* channel list */
-  .channels { background: var(--side); padding: 18px 8px; }
-  .cat { display: flex; align-items: center; gap: 4px; color: var(--muted); font-size: .74rem; font-weight: 700;
-         letter-spacing: .04em; text-transform: uppercase; padding: 14px 8px 6px; }
-  .cat:first-child { padding-top: 0; }
-  .cat::after { content: "⌄"; font-size: .9rem; line-height: 0; margin-top: -4px; }
-  .ch { display: flex; align-items: center; gap: 6px; width: 100%; text-align: left; font: 500 .98rem var(--font);
-        color: var(--muted); background: none; border: 0; border-radius: 6px; padding: 7px 10px; margin: 1px 0; cursor: pointer; }
-  .ch .hash { font-size: 1.25rem; line-height: 1; color: #80848e; font-weight: 400; width: 16px; }
-  .ch:hover { background: var(--row); color: var(--text); }
-  .ch[aria-pressed="true"], .ch[aria-selected="true"] { background: var(--sel); color: var(--head); font-weight: 600; }
-  .ch .count { margin-left: auto; font-size: .75rem; color: var(--muted); font-weight: 600; }
-
-  /* content */
-  main { padding: 20px 24px 64px; min-width: 0; }
-  .chhead { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; padding-bottom: 12px; border-bottom: 1px solid var(--line); }
-  .chhead h2 { margin: 0; font-size: 1.15rem; color: var(--head); font-weight: 700; }
-  .chhead h2 .hash { color: #80848e; font-weight: 400; margin-right: 4px; }
-  .chhead p { margin: 0; color: var(--muted); font-size: .88rem; }
-  .meta { color: var(--muted); font-size: .8rem; margin: 10px 0 0; }
-
-  .board { margin: 18px 0 6px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-  .tile { background: var(--side); border-radius: 8px; padding: 14px 16px; min-width: 0; }
-  .tile b { display: block; font-size: clamp(1.7rem, 5vw, 2.4rem); line-height: 1.1; font-weight: 800; color: var(--head);
-            font-variant-numeric: tabular-nums; }
-  .tile b.pos { color: var(--green); } .tile b.neg { color: var(--loss); }
-  .tile span { color: var(--muted); font-size: .8rem; font-weight: 600; text-transform: uppercase; letter-spacing: .03em; }
-
-  h3 { margin: 28px 0 10px; font-size: .78rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
-  .chart { background: var(--side); border-radius: 8px; padding: 12px; }
-  .chart svg { display: block; width: 100%; height: 170px; }
-
-  table.split { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; background: var(--side); border-radius: 8px; overflow: hidden; }
-  .split th, .split td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line); }
-  .split tr:last-child td { border-bottom: 0; }
-  .split th { color: var(--muted); font-weight: 600; font-size: .78rem; }
+  table.split { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+  .split th, .split td { text-align: left; padding: 9px 4px; border-bottom: 1px solid var(--line); }
+  .split th { color: var(--muted); font-weight: 600; font-size: .85rem; }
   .split td:not(:first-child), .split th:not(:first-child) { text-align: right; }
-  .note { color: var(--muted); font-size: .82rem; margin: 8px 0 0; }
 
-  .filters { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 8px; }
-  .filters button { font: 600 .8rem var(--font); color: var(--text); background: var(--side); border: 0;
-                    border-radius: 999px; padding: 6px 12px; cursor: pointer; }
-  .filters button:hover { background: var(--row); }
-  .filters button[aria-pressed="true"] { background: var(--green); color: #fff; }
+  .filters { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 14px; }
+  .filters button { font: 600 .85rem var(--body); color: var(--text); background: transparent;
+                    border: 1px solid var(--line); border-radius: 999px; padding: 6px 14px; cursor: pointer; }
+  .filters button[aria-pressed="true"] { background: var(--gold); border-color: var(--gold); color: var(--ink); }
 
-  /* picks read like posts in a channel */
   ol.ledger { list-style: none; margin: 0; padding: 0; }
-  .bet { display: grid; grid-template-columns: 40px 1fr auto; gap: 2px 12px; align-items: start; padding: 10px 8px; border-radius: 6px; }
-  .bet:hover { background: #2e3035; }
-  .badge { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; font-weight: 800; color: #fff; }
-  .win .badge { background: var(--green); } .loss .badge { background: var(--loss); } .push .badge { background: #5c5e66; }
-  .what { font-weight: 700; color: var(--head); }
-  .what small { font-weight: 600; color: var(--muted); font-size: .72rem; margin-left: 6px; }
-  .sub { color: var(--muted); font-size: .84rem; }
-  .u { font-weight: 800; font-size: 1.05rem; font-variant-numeric: tabular-nums; text-align: right; }
-  .win .u { color: var(--green); } .loss .u { color: var(--loss); } .push .u { color: var(--muted); }
-  .empty { background: var(--side); border-radius: 8px; padding: 20px; color: var(--muted); margin-top: 18px; }
-  footer { margin-top: 44px; color: var(--muted); font-size: .76rem; max-width: 70ch; }
+  .bet { display: grid; grid-template-columns: 44px 1fr auto; gap: 4px 14px; align-items: start;
+         padding: 14px 0; border-bottom: 1px solid var(--line); }
+  .stamp { font: 700 1.15rem/1 var(--num); width: 40px; height: 40px; border-radius: 8px; display: grid;
+           place-items: center; border: 2px solid currentColor; transform: rotate(-4deg); }
+  .win .stamp { color: var(--win); } .loss .stamp { color: var(--loss); } .push .stamp { color: var(--muted); }
+  .what { font-weight: 600; }
+  .sub { color: var(--muted); font-size: .85rem; }
+  .u { font: 700 1.3rem/1.2 var(--num); font-variant-numeric: tabular-nums; text-align: right; }
+  .win .u { color: var(--win); } .loss .u { color: var(--loss); } .push .u { color: var(--muted); }
+  .empty { background: var(--panel); border-radius: 10px; padding: 22px; color: var(--muted); }
+  footer { margin-top: 48px; color: var(--muted); font-size: .8rem; max-width: 70ch; }
 
-  /* phones: the channel list becomes two scrollable rows above the content */
-  @media (max-width: 760px) {
-    .layout { grid-template-columns: 1fr; }
-    .channels { padding: 10px 12px 8px; display: flex; flex-direction: column; gap: 4px; }
-    .group { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; }
-    .group::-webkit-scrollbar { display: none; }
-    .cat { display: none; }
-    .ch { width: auto; flex: none; margin: 0; padding: 6px 12px 6px 8px; background: var(--bg); }
-    .ch .count { margin-left: 4px; }
-    main { padding: 16px 16px 56px; }
-    .board { grid-template-columns: 1fr 1fr; }
-    .board .tile:first-child { grid-column: 1 / -1; }
-    .bet { grid-template-columns: 36px 1fr; padding: 10px 4px; }
-    .badge { width: 36px; height: 36px; }
+  @media (max-width: 560px) {
+    .board { grid-template-columns: 1fr 1fr; padding: 18px; }
+    .board div:first-child { grid-column: 1 / -1; }
+    .bet { grid-template-columns: 40px 1fr; }
     .u { grid-column: 2; text-align: left; }
-    .sitenav .brand span { font-size: 1rem; }
   }
 </style>
 </head>
 <body>
-<nav class="sitenav" aria-label="Site"><div class="in">
-  <a class="brand" href="./" aria-label="Book Buster home">
-    <svg width="30" height="30" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="15" fill="#0f2a1c" stroke="#23a55a" stroke-width="2"/><text x="16" y="22.5" text-anchor="middle" fill="#f0b232" style="font: 700 19px Georgia, serif">$</text></svg>
-    <span>Book Buster</span></a>
-  <a class="tab" href="./" aria-current="page">Record</a><a class="tab" href="bankroll.html">My Bankroll</a>
-</div></nav>
-<h1 class="sr">Book Buster track record</h1>
+<nav class="sitenav" aria-label="Site"><div class="in"><a class="brand" href="./">Book <b>Buster</b></a><a class="tab" href="./" aria-current="page">Record</a><a class="tab" href="bankroll.html">My Bankroll</a><a class="login" id="navAuth" href="login.html">Log in</a></div></nav>
+<main>
+  <h1 class="sr">Book Buster track record</h1>
+  <nav class="tabs" role="tablist" aria-label="Results">
+    <button role="tab" id="tab-proven" aria-selected="true" aria-controls="proven">Proven</button>
+    <button role="tab" id="tab-testing" aria-selected="false" aria-controls="testing">Testing</button>
+  </nav>
+  <p class="meta" id="meta"></p>
 
-<div class="layout">
-  <aside class="channels" aria-label="Channels">
-    <div class="cat">Record</div>
-    <div class="group" role="tablist" aria-label="Results">
-      <button class="ch" role="tab" id="tab-proven" aria-selected="true" aria-controls="view"><span class="hash">#</span>📈 proven</button>
-      <button class="ch" role="tab" id="tab-testing" aria-selected="false" aria-controls="view"><span class="hash">#</span>🧪 testing</button>
-    </div>
-    <div class="cat">Sports</div>
-    <div class="group" id="sports" role="group" aria-label="Sport"></div>
-  </aside>
+  <section id="proven" role="tabpanel" aria-labelledby="tab-proven">
+    <p class="lede">Picks from proven bet types, sent to members and graded when the game ends. Wins and losses both stay up. Nothing gets deleted.</p>
+    <div class="panel"></div>
+  </section>
 
-  <main id="view">
-    <div class="chhead"><h2 id="title"><span class="hash">#</span>📈 proven</h2><p id="lede"></p></div>
-    <p class="meta" id="meta"></p>
-    <div id="panel"></div>
-    <footer>
-      A unit is whatever amount you choose to bet; results are shown in units so they apply to any bankroll.
-      Each pick shows when it was posted and when the game started. Past results don't guarantee future results.
-      For entertainment only, not financial advice. 21+ where legal. Need help? 1-800-GAMBLER.
-    </footer>
-  </main>
-</div>
+  <section id="testing" role="tabpanel" aria-labelledby="tab-testing" hidden>
+    <p class="lede">Bet types still proving themselves, graded the same way. Some went to members as small-stake picks; the rest are tracked quietly. When a type proves itself, it moves to Proven.</p>
+    <div class="panel"></div>
+  </section>
 
+  <footer>
+    A unit is whatever amount you choose to bet; results are shown in units so they apply to any bankroll.
+    Each pick shows when it was posted and when the game started. Past results don't guarantee future results.
+    For entertainment only, not financial advice. 21+ where legal. Need help? 1-800-GAMBLER.
+  </footer>
+</main>
+<script type="module" src="session.js"></script>
 <script>
-const LEDE = {
-  proven: "Picks from proven bet types, sent to members and graded when the game ends. Wins and losses both stay up. Nothing gets deleted.",
-  testing: "Bet types still proving themselves, graded the same way. Some went to members as small-stake picks; the rest are tracked quietly. When a type proves itself, it moves to Proven."
-};
-const SPORT = { NBA: "basketball", CBB: "basketball", NFL: "football", CFB: "football", MLB: "baseball", NHL: "hockey",
-                SOCCER: "soccer", TENNIS: "tennis", UFC: "ufc" };
-const ICON = { basketball: "🏀", football: "🏈", baseball: "⚾", hockey: "🏒", soccer: "⚽", tennis: "🎾", ufc: "🥊" };
-const ORDER = ["basketball", "football", "baseball", "hockey", "soccer", "tennis", "ufc"];
-const sportOf = b => SPORT[(b.sport || "").toUpperCase()] || "other";
-
 const fmtU = u => (u >= 0 ? "+" : "−") + Math.abs(u).toFixed(1) + "u";
 const dt = s => new Date(s);
 const day = d => d.toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" });
@@ -167,41 +126,13 @@ const time = d => d.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-
 const pct = r => (r >= 0 ? "+" : "−") + Math.abs(r * 100).toFixed(1) + "%";
 const esc = t => String(t).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 const wl = g => [g.filter(b => b.result === "win").length, g.filter(b => b.result === "loss").length];
-function record(bets) {
-  const [w, l] = wl(bets), p = bets.filter(b => b.result === "push").length;
-  const risked = bets.filter(b => b.result !== "push").reduce((s, b) => s + b.stake, 0);
-  const units = bets.reduce((s, b) => s + b.units, 0);
-  return { wins: w, losses: l, pushes: p, units, roi: risked ? units / risked : null };
-}
 
-let DATA = null, TAB = "proven", SPORTSEL = "all";
-
-function sportsList() {
-  const all = [...DATA.proven.bets, ...DATA.testing.bets];
-  const have = ORDER.filter(s => all.some(b => sportOf(b) === s));
-  const n = s => DATA[TAB].bets.filter(b => s === "all" || sportOf(b) === s).length;
-  const row = (s, label) => `<button class="ch" type="button" data-sport="${s}" aria-pressed="${SPORTSEL === s}">` +
-    `<span class="hash">#</span>${label}<span class="count">${n(s)}</span></button>`;
-  document.getElementById("sports").innerHTML = row("all", "📋 all-sports") + have.map(s => row(s, `${ICON[s]} ${s}`)).join("");
-}
-
-function draw() {
-  const tab = DATA[TAB], since = day(dt(DATA.since + "T12:00:00"));
-  const bets = tab.bets.filter(b => SPORTSEL === "all" || sportOf(b) === SPORTSEL);
-  const label = TAB === "proven" ? "📈 proven" : "🧪 testing";
-  document.getElementById("title").innerHTML = `<span class="hash">#</span>${label}` +
-    (SPORTSEL === "all" ? "" : ` <span style="color:var(--muted);font-weight:600">· ${ICON[SPORTSEL] || ""} ${SPORTSEL}</span>`);
-  document.getElementById("lede").textContent = LEDE[TAB];
-  sportsList();
-  const el = document.getElementById("panel");
-  if (!bets.length) {
-    el.innerHTML = `<p class="empty">${TAB === "proven" ? `Tracking started ${since}.` : "Nothing finished here yet."} Results show up the night each game ends.</p>`;
-    return;
-  }
-  const r = record(bets);
+function panel(el, tab, tested, emptyText) {
+  const bets = tab.bets, r = tab.record;
+  if (!bets.length) { el.innerHTML = `<p class="empty">${emptyText}</p>`; return; }
   let run = 0; const pts = [0, ...bets.map(b => (run += b.units))];
   const lo = Math.min(0, ...pts), hi = Math.max(0, ...pts), span = (hi - lo) || 1;
-  const x = i => (i / (pts.length - 1)) * 790 + 5, y = v => 165 - ((v - lo) / span) * 155;
+  const x = i => (i / (pts.length - 1)) * 790 + 5, y = v => 180 - ((v - lo) / span) * 170;
   const path = pts.map((v, i) => `${i ? "L" : "M"}${x(i).toFixed(1)},${y(v).toFixed(1)}`).join("");
   const groups = {};
   for (const b of bets) (groups[b.group] ??= []).push(b);
@@ -209,31 +140,30 @@ function draw() {
     const [w, l] = wl(g), u = g.reduce((s, b) => s + b.units, 0);
     return `<tr><td>${esc(k)}</td><td>${w}-${l}</td><td>${w + l ? Math.round(w / (w + l) * 100) + "%" : "n/a"}</td><td>${fmtU(u)}</td></tr>`;
   }).join("");
-  const notes = TAB === "proven" && SPORTSEL === "all" ? Object.entries(tab.tested || {}).map(([k, t]) =>
-    `<p class="note">${esc(k)} went live after testing at ${t.wins}-${t.losses} (${fmtU(t.units)}). That testing record isn't counted in the totals above.</p>`).join("") : "";
-  const cls = v => v == null ? "" : v > 0 ? "pos" : v < 0 ? "neg" : "";
+  const notes = Object.entries(tested || {}).map(([k, t]) =>
+    `<p class="note">${esc(k)} went live after testing at ${t.wins}-${t.losses} (${fmtU(t.units)}). That testing record isn't counted in the totals above.</p>`).join("");
   el.innerHTML = `
-    <div class="board"><div class="tile"><b>${r.wins}-${r.losses}${r.pushes ? "-" + r.pushes : ""}</b><span>Record (W-L)</span></div>
-      <div class="tile"><b class="${cls(r.units)}">${fmtU(r.units)}</b><span>Units won</span></div>
-      <div class="tile"><b class="${cls(r.roi)}">${r.roi == null ? "n/a" : pct(r.roi)}</b><span>Return per unit</span></div></div>
-    <h3>Units over time</h3>
-    <div class="chart"><svg viewBox="0 0 800 170" preserveAspectRatio="none" role="img" aria-label="Running units won">
-      <line x1="0" x2="800" y1="${y(0)}" y2="${y(0)}" stroke="#4e5058" stroke-dasharray="4 5"/>
-      <path d="${path}" fill="none" stroke="${run >= 0 ? "#23a55a" : "#f23f43"}" stroke-width="3" vector-effect="non-scaling-stroke" stroke-linejoin="round"/></svg></div>
-    <h3>By bet type</h3>
+    <div class="board"><div><b>${r.wins}-${r.losses}${r.pushes ? "-" + r.pushes : ""}</b><span>Record (wins-losses)</span></div>
+      <div><b class="${r.units < 0 ? "neg" : ""}">${fmtU(r.units)}</b><span>Units won</span></div>
+      <div><b class="${r.roi < 0 ? "neg" : ""}">${r.roi == null ? "n/a" : pct(r.roi)}</b><span>Return per unit bet</span></div></div>
+    <h2>Units over time</h2>
+    <div class="chart"><svg viewBox="0 0 800 190" preserveAspectRatio="none" role="img" aria-label="Running units won">
+      <line x1="0" x2="800" y1="${y(0)}" y2="${y(0)}" stroke="#24384f" stroke-dasharray="4 5"/>
+      <path d="${path}" fill="none" stroke="${run >= 0 ? "#f2b33d" : "#ef6a61"}" stroke-width="3" vector-effect="non-scaling-stroke" stroke-linejoin="round"/></svg></div>
+    <h2>By bet type</h2>
     <table class="split"><thead><tr><th scope="col">Bet type</th><th scope="col">Record</th><th scope="col">Win rate</th><th scope="col">Units</th></tr></thead>
       <tbody>${rows}</tbody></table>${notes}
-    <h3>Every pick</h3>
+    <h2>Every pick</h2>
     <div class="filters" role="group" aria-label="Show bet type">${["All", ...Object.keys(groups)].map((t, i) =>
       `<button type="button" aria-pressed="${i === 0}">${esc(t)}</button>`).join("")}</div>
     <ol class="ledger"></ol>`;
   const f = el.querySelector(".filters"), ledger = el.querySelector(".ledger");
-  const list = t => {
+  const draw = t => {
     ledger.innerHTML = bets.filter(b => t === "All" || b.group === t).slice().reverse().map(b => {
       const s = dt(b.start), p = dt(b.posted);
       return `<li class="bet ${b.result}">
-        <span class="badge" aria-label="${b.result}">${b.result === "win" ? "W" : b.result === "loss" ? "L" : "P"}</span>
-        <div><div class="what">${esc(b.bet)}<small>${esc(b.group)}</small></div>
+        <span class="stamp" aria-label="${b.result}">${b.result === "win" ? "W" : b.result === "loss" ? "L" : "P"}</span>
+        <div><div class="what">${esc(b.bet)}</div>
           <div class="sub">${esc(b.game)}, final ${esc(b.final)}. ${esc(b.book)}, ${b.stake === 1 ? "1 unit" : b.stake + " units"}</div>
           <div class="sub">Posted ${day(p)} ${time(p)}, game started ${time(s)}</div></div>
         <div class="u">${fmtU(b.units)}</div></li>`;
@@ -242,29 +172,31 @@ function draw() {
   f.addEventListener("click", e => {
     if (e.target.tagName !== "BUTTON") return;
     f.querySelectorAll("button").forEach(btn => btn.setAttribute("aria-pressed", btn === e.target));
-    list(e.target.textContent);
+    draw(e.target.textContent);
   });
-  list("All");
+  draw("All");
 }
 
-document.querySelectorAll('[role="tab"]').forEach(t => t.addEventListener("click", () => {
-  TAB = t.id === "tab-proven" ? "proven" : "testing";
-  document.querySelectorAll('[role="tab"]').forEach(o => o.setAttribute("aria-selected", o === t));
-  if (DATA) draw();
-}));
-document.getElementById("sports").addEventListener("click", e => {
-  const b = e.target.closest("[data-sport]");
-  if (!b || !DATA) return;
-  SPORTSEL = b.dataset.sport; draw();
-});
-
-fetch("results.json", { cache: "no-store" }).then(r => r.json()).then(d => {
-  DATA = d;
-  document.title = `${d.name} · Record`;
+function render(data) {
+  document.title = `${data.name} · Record`;
+  const since = day(dt(data.since + "T12:00:00"));
   document.getElementById("meta").textContent =
-    `Tracking since ${day(dt(d.since + "T12:00:00"))}. Updated ${day(dt(d.updated))} at ${time(dt(d.updated))}.`;
-  draw();
-}).catch(() => {
+    `Tracking since ${since}. Updated ${day(dt(data.updated))} at ${time(dt(data.updated))}.`;
+  panel(document.querySelector("#proven .panel"), data.proven, data.proven.tested,
+    `Tracking started ${since}. Results show up here the night each game ends.`);
+  panel(document.querySelector("#testing .panel"), data.testing, null,
+    `Nothing finished in testing yet. Results show up here the night each game ends.`);
+}
+
+const tabs = document.querySelectorAll('[role="tab"]');
+tabs.forEach(t => t.addEventListener("click", () => {
+  tabs.forEach(o => {
+    o.setAttribute("aria-selected", o === t);
+    document.getElementById(o.getAttribute("aria-controls")).hidden = o !== t;
+  });
+}));
+
+fetch("results.json", { cache: "no-store" }).then(r => r.json()).then(render).catch(() => {
   document.getElementById("meta").textContent = "Results couldn't load. Refresh the page in a minute.";
 });
 </script>
