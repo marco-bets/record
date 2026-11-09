@@ -1,103 +1,26 @@
 {
  "name": "Book Buster",
- "updated": "2026-11-09T09:25:13-05:00",
+ "updated": "2026-11-09T11:51:00-05:00",
  "since": "2026-11-04",
  "record": {
-  "wins": 3,
-  "losses": 3,
+  "wins": 0,
+  "losses": 0,
   "pushes": 0,
-  "units": -0.08,
-  "roi": -0.0533
+  "units": 0,
+  "roi": null
  },
- "bets": [
+ "bets": [],
+ "retired": [
   {
-   "posted": "2026-11-07T19:03:32-05:00",
-   "start": "2026-11-07T22:00:00-05:00",
    "group": "Top 5 board",
-   "sport": "CBB",
-   "sent": true,
-   "bet": "Over 145.5 (-110)",
-   "book": "FanDuel",
-   "game": "San Jos\u00e9 State Spartans @ UC Irvine Anteaters",
-   "final": "79-91",
-   "stake": 0.25,
-   "result": "win",
-   "units": 0.23
-  },
-  {
-   "posted": "2026-11-08T07:00:17-05:00",
-   "start": "2026-11-08T12:00:00-05:00",
-   "group": "Top 5 board",
-   "sport": "CBB",
-   "sent": true,
-   "bet": "Under 151.5 (-108)",
-   "book": "DraftKings",
-   "game": "Iona Gaels @ St. John's Red Storm",
-   "final": "65-104",
-   "stake": 0.25,
-   "result": "loss",
-   "units": -0.25
-  },
-  {
-   "posted": "2026-11-08T07:00:17-05:00",
-   "start": "2026-11-08T13:00:00-05:00",
-   "group": "Top 5 board",
-   "sport": "NFL",
-   "sent": true,
-   "bet": "Commanders +4.5 (+100)",
-   "book": "DraftKings",
-   "game": "Rams @ Commanders",
-   "final": "20-13",
-   "stake": 0.25,
-   "result": "loss",
-   "units": -0.25
-  },
-  {
-   "posted": "2026-11-08T07:00:17-05:00",
-   "start": "2026-11-08T13:00:00-05:00",
-   "group": "Top 5 board",
-   "sport": "NFL",
-   "sent": true,
-   "bet": "Colts +5.5 (-115)",
-   "book": "DraftKings",
-   "game": "Cowboys @ Colts",
-   "final": "27-23",
-   "stake": 0.25,
-   "result": "win",
-   "units": 0.22
-  },
-  {
-   "posted": "2026-11-08T07:00:17-05:00",
-   "start": "2026-11-08T19:30:00-05:00",
-   "group": "Top 5 board",
-   "sport": "NBA",
-   "sent": true,
-   "bet": "Over 219.5 (-113)",
-   "book": "DraftKings",
-   "game": "Nets @ Mavericks",
-   "final": "93-130",
-   "stake": 0.25,
-   "result": "win",
-   "units": 0.22
-  },
-  {
-   "posted": "2026-11-08T07:00:17-05:00",
-   "start": "2026-11-08T20:00:00-05:00",
-   "group": "Top 5 board",
-   "sport": "NBA",
-   "sent": true,
-   "bet": "Over 221.5 (-110)",
-   "book": "DraftKings",
-   "game": "Celtics @ Bucks",
-   "final": "117-97",
-   "stake": 0.25,
-   "result": "loss",
-   "units": -0.25
+   "first": "2026-11-07T19:03:32-05:00",
+   "last": "2026-11-08T07:00:17-05:00",
+   "wins": 3,
+   "losses": 3,
+   "pushes": 0,
+   "units": -0.08,
+   "roi": -0.0533
   }
  ],
- "leagues": [
-  "NBA",
-  "CBB",
-  "NFL"
- ]
+ "leagues": []
 }
