@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>The Profit Room</title>
+<title>Book Buster</title>
 <meta name="description" content="Every pick posted, graded automatically. Nothing deleted.">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="icon-180.png">
@@ -97,10 +97,10 @@
 </style>
 </head>
 <body>
-<nav class="sitenav" aria-label="Site"><div class="in"><a class="brand" href="./" id="brand">The <b>Profit</b> Room</a><a class="tab" href="./" aria-current="page">Record</a><a class="tab" href="bankroll.html">My Bankroll</a></div></nav>
+<nav class="sitenav" aria-label="Site"><div class="in"><a class="brand" href="./" id="brand">Book <b>Buster</b></a><a class="tab" href="./" aria-current="page">Record</a><a class="tab" href="bankroll.html">My Bankroll</a></div></nav>
 <main>
   <header>
-    <h1 id="name">Results</h1>
+    <h1 id="name">Track record</h1>
   </header>
 
   <nav class="tabs" role="tablist" aria-label="Results">
@@ -110,12 +110,12 @@
   <p class="meta" id="meta"></p>
 
   <section id="proven" role="tabpanel" aria-labelledby="tab-proven">
-    <p class="lede">Every pick sent to members, graded when the game ends. Wins and losses both stay up. Nothing gets deleted.</p>
+    <p class="lede">Picks from proven bet types, sent to members and graded when the game ends. Wins and losses both stay up. Nothing gets deleted.</p>
     <div class="panel"></div>
   </section>
 
   <section id="testing" role="tabpanel" aria-labelledby="tab-testing" hidden>
-    <p class="lede">Bet types we're still testing. These are tracked here but not sent to members. When one proves itself, it moves to Proven.</p>
+    <p class="lede">Bet types still proving themselves, graded the same way. Some went to members as small-stake picks; the rest are tracked quietly. When a type proves itself, it moves to Proven.</p>
     <div class="panel"></div>
   </section>
 
@@ -186,7 +186,6 @@ function panel(el, tab, tested, emptyText) {
 
 function render(data) {
   document.title = `${data.name} · Results`;
-  document.getElementById("name").textContent = data.name;
   const since = day(dt(data.since + "T12:00:00"));
   document.getElementById("meta").textContent =
     `Tracking since ${since}. Updated ${day(dt(data.updated))} at ${time(dt(data.updated))}.`;
