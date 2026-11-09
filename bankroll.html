@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>My Bankroll · The Profit Room</title>
+<meta name="theme-color" content="#0a1422">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Book Buster">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@500;700&family=Public+Sans:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+<style>
+  /* one site, two pages: the same top bar on both */
+  .sitenav { position: sticky; top: 0; z-index: 20; background: #0a1422; border-bottom: 1px solid #24384f; }
+  .sitenav .in { max-width: 860px; margin: 0 auto; padding: 0 16px; display: flex; align-items: center; gap: 2px; height: 52px; }
+  .sitenav .brand { font: 700 1.2rem/1 "Saira Condensed", "Arial Narrow", sans-serif; color: #e8edf3; text-decoration: none;
+                    margin-right: auto; white-space: nowrap; }
+  .sitenav .brand b { color: #f2b33d; }
+  .sitenav .tab { color: #93a4b8; text-decoration: none; font: 600 .95rem/1 "Public Sans", system-ui, sans-serif;
+                  padding: 17px 10px 14px; border-bottom: 3px solid transparent; white-space: nowrap; }
+  .sitenav .tab:hover { color: #e8edf3; }
+  .sitenav .tab[aria-current="page"] { color: #e8edf3; border-bottom-color: #f2b33d; }
+  .sitenav a:focus-visible { outline: 2px solid #f2b33d; outline-offset: -2px; }
+
+/* Sportsbook-app layout: navy balance header, white cards, blue actions, bet slip, Open/Settled tabs */
+:root {
+  --bg: #eef1f5; --surface: #ffffff; --ink: #0f1b2d; --muted: #5d6b7e; --line: #e2e7ee; --field: #f4f6f9;
+  --nav: #0c2340; --nav-2: #163a66; --nav-ink: #ffffff; --nav-muted: #a9bad1;
+  --blue: #1570ef; --blue-ink: #ffffff; --blue-soft: #e9f2fe; --blue-line: #b9d4fb;
+  --win: #0f8a43; --win-soft: #e4f6eb; --loss: #d1342f; --loss-soft: #fdeceb; --push: #6b7789;
+  --rain: #0b7d89; --rain-soft: #e2f4f5;
+  --shadow: 0 1px 2px rgba(15, 27, 45, .06), 0 2px 8px rgba(15, 27, 45, .05);
+  --font: "Inter", -apple-system, "Helvetica Neue", Arial, sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #07101d; --surface: #0f1b2c; --ink: #e8eef7; --muted: #93a3b8; --line: #1d2b40; --field: #0b1626;
+  --nav: #0a1a31; --nav-2: #15345c; --nav-muted: #93a8c4;
+  --blue: #4a98ff; --blue-ink: #04111f; --blue-soft: #11294a; --blue-line: #24508a;
+  --win: #3fcf7c; --win-soft: #0f2c1d; --loss: #ff6b62; --loss-soft: #361617; --push: #93a3b8;
+  --rain: #4fd0dc; --rain-soft: #0d2b30; --shadow: none; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #07101d; --surface: #0f1b2c; --ink: #e8eef7; --muted: #93a3b8; --line: #1d2b40; --field: #0b1626;
+  --nav: #0a1a31; --nav-2: #15345c; --nav-muted: #93a8c4;
+  --blue: #4a98ff; --blue-ink: #04111f; --blue-soft: #11294a; --blue-line: #24508a;
+  --win: #3fcf7c; --win-soft: #0f2c1d; --loss: #ff6b62; --loss-soft: #361617; --push: #93a3b8;
+  --rain: #4fd0dc; --rain-soft: #0d2b30; --shadow: none; color-scheme: dark }
+* { box-sizing: border-box }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.45 var(--font); -webkit-font-smoothing: antialiased; font-feature-settings: "tnum" }
+[hidden] { display: none !important }
+.wrap { max-width: 520px; margin: 0 auto; padding: 0 max(16px, env(safe-area-inset-right, 0px)) 40px max(16px, env(safe-area-inset-left, 0px)); display: flex; flex-direction: column; gap: 12px }
+
+/* header */
+.head { background: linear-gradient(180deg, var(--nav) 0%, var(--nav-2) 100%); color: var(--nav-ink); margin: 0 calc(-1 * max(16px, env(safe-area-inset-left, 0px))); padding: 14px max(16px, env(safe-area-inset-left, 0px)) 18px; display: flex; flex-direction: column; gap: 14px }
+@media (min-width: 552px) { .head { margin: 0; border-radius: 0 0 16px 16px } }
+.bar1 { display: flex; justify-content: space-between; align-items: center; gap: 10px }
+.brand { font: 800 17px/1 var(--font); letter-spacing: -.01em; display: flex; align-items: center; gap: 8px }
+.brand .mark { width: 26px; height: 26px; border-radius: 7px; background: var(--blue); display: inline-flex; align-items: center; justify-content: center; font: 800 13px/1 var(--font); color: #fff }
+.brand small { font: 600 12px/1 var(--font); color: var(--nav-muted); letter-spacing: .02em }
+.pill { font: 700 12px/1 var(--font); padding: 6px 10px; border-radius: 999px; background: rgba(255,255,255,.12); color: var(--nav-ink) }
+.bal .lbl { font: 600 12px/1 var(--font); color: var(--nav-muted); letter-spacing: .03em; text-transform: uppercase }
+.bal .amt { font: 800 clamp(38px, 12vw, 48px)/1.05 var(--font); letter-spacing: -.02em; margin-top: 6px }
+.stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px }
+.stat { background: rgba(255,255,255,.08); border-radius: 10px; padding: 10px }
+.stat span { display: block; font: 600 11px/1 var(--font); color: var(--nav-muted); text-transform: uppercase; letter-spacing: .04em }
+.stat b { display: block; font: 700 16px/1.2 var(--font); margin-top: 6px; overflow-wrap: anywhere }
+
+/* cards */
+.card { background: var(--surface); border-radius: 14px; box-shadow: var(--shadow); border: 1px solid var(--line); padding: 16px; display: flex; flex-direction: column; gap: 12px; min-width: 0 }
+.ch { display: flex; justify-content: space-between; align-items: center; gap: 8px }
+h2 { font: 700 16px/1.2 var(--font); margin: 0; letter-spacing: -.01em }
+.sub { font-size: 14px; color: var(--muted); margin: 0 }
+.sub b { color: var(--ink); font-weight: 700 }
+.unitbig { font: 800 30px/1 var(--font); color: var(--blue); letter-spacing: -.02em }
+
+/* odds-style unit buttons */
+.odds { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px }
+.odds button { border: 1px solid var(--blue-line); background: var(--surface); color: var(--ink); border-radius: 10px; padding: 9px 4px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 3px; font: 600 12px/1.1 var(--font); color: var(--muted) }
+.odds button b { font: 700 15px/1.1 var(--font); color: var(--blue) }
+.odds button[aria-pressed="true"] { background: var(--blue); border-color: var(--blue); color: var(--blue-ink) }
+.odds button[aria-pressed="true"] b { color: var(--blue-ink) }
+
+.prog { height: 6px; border-radius: 999px; background: var(--field); overflow: hidden }
+.prog i { display: block; height: 100%; width: 0; background: var(--blue); border-radius: 999px }
+.row { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; font-size: 14px }
+.row .k { color: var(--muted) }
+.row .v { font-weight: 700 }
+.alert { border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 10px; background: var(--blue-soft); border: 1px solid var(--blue-line) }
+.alert.down { background: var(--loss-soft); border-color: transparent }
+.alert strong { font-weight: 700 }
+.alert ol { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 6px; font-size: 14px }
+.rainc { color: var(--rain); font-weight: 700 }
+
+/* form */
+.field { display: flex; flex-direction: column; gap: 6px; min-width: 0 }
+.field > span { font: 600 12px/1 var(--font); color: var(--muted) }
+input, textarea { font: 600 16px/1.3 var(--font); color: var(--ink); background: var(--field); border: 1px solid var(--line); border-radius: 10px; padding: 12px; width: 100%; min-width: 0 }
+textarea { min-height: 72px; resize: vertical; font-weight: 500; font-size: 14px }
+input:focus, textarea:focus { outline: none; border-color: var(--blue); box-shadow: 0 0 0 3px var(--blue-soft) }
+button:focus-visible, summary:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px }
+.stake { position: relative }
+.stake input { font-size: 24px; font-weight: 800; padding-left: 30px; padding-right: 96px }
+.stake .cur { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); font: 800 22px/1 var(--font); color: var(--muted) }
+.stake .u { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); font: 700 13px/1 var(--font); color: var(--blue); background: var(--blue-soft); padding: 6px 8px; border-radius: 999px }
+.grid2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px }
+.slipsum { border-top: 1px solid var(--line); padding-top: 12px; display: flex; flex-direction: column; gap: 6px }
+.btn { border: 0; border-radius: 10px; padding: 14px 10px; font: 700 16px/1 var(--font); cursor: pointer; width: 100% }
+.btn.main { background: var(--blue); color: var(--blue-ink) }
+.btn.main:active { filter: brightness(.95) }
+.btn.ghost { background: var(--field); color: var(--ink); border: 1px solid var(--line) }
+.linkbtn { background: none; border: 0; padding: 0; color: var(--blue); font: 600 14px var(--font); cursor: pointer }
+details.paste summary { color: var(--blue); font-weight: 600; font-size: 14px; cursor: pointer; list-style: none }
+details.paste summary::-webkit-details-marker { display: none }
+details.paste[open] summary { margin-bottom: 8px }
+.msg { font-size: 14px; margin: 0 }
+.msg.err { color: var(--loss) } .msg.ok { color: var(--win) } .msg.warn { color: #b26b00 }
+
+/* my bets */
+.tabs { display: flex; gap: 6px; background: var(--field); padding: 4px; border-radius: 10px }
+.tabs button { flex: 1; border: 0; background: none; padding: 9px 6px; border-radius: 8px; font: 700 14px/1 var(--font); color: var(--muted); cursor: pointer }
+.tabs button[aria-selected="true"] { background: var(--surface); color: var(--ink); box-shadow: var(--shadow) }
+.list { display: flex; flex-direction: column; gap: 10px }
+.bet { border: 1px solid var(--line); border-radius: 12px; padding: 12px; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 10px; align-items: center }
+.bet .what { font-weight: 700; overflow-wrap: anywhere }
+.bet .meta { font-size: 12px; color: var(--muted) }
+.bet .res { font: 700 15px/1.2 var(--font); text-align: right; white-space: nowrap }
+.bet .res small { display: block; font-size: 12px; color: var(--muted); font-weight: 600 }
+.bet .res.w { color: var(--win) } .bet .res.l { color: var(--loss) } .bet .res.p { color: var(--push) }
+.badge { font: 700 11px/1 var(--font); padding: 4px 7px; border-radius: 6px; text-transform: uppercase; letter-spacing: .04em }
+.badge.w { background: var(--win-soft); color: var(--win) } .badge.l { background: var(--loss-soft); color: var(--loss) } .badge.p { background: var(--field); color: var(--push) }
+.settle { grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-top: 6px }
+.settle button { border: 0; border-radius: 8px; padding: 10px 4px; font: 700 14px/1 var(--font); cursor: pointer }
+.settle .w { background: var(--win-soft); color: var(--win) } .settle .l { background: var(--loss-soft); color: var(--loss) } .settle .p { background: var(--field); color: var(--ink) }
+.del { background: none; border: 0; color: var(--muted); font: 500 12px var(--font); cursor: pointer; padding: 2px 0; text-align: right }
+.del.armed { color: var(--loss); font-weight: 700 }
+.empty { color: var(--muted); font-size: 14px; margin: 0; padding: 14px 0; text-align: center }
+
+details.acct summary { display: flex; justify-content: space-between; align-items: center; cursor: pointer; list-style: none; font: 700 16px/1.2 var(--font) }
+details.acct summary::-webkit-details-marker { display: none }
+details.acct summary::after { content: "›"; font-size: 22px; color: var(--muted); transform: rotate(90deg); transition: transform .2s }
+details.acct[open] summary::after { transform: rotate(-90deg) }
+.more { display: flex; flex-direction: column; gap: 20px; margin-top: 14px }
+.more h3 { font: 700 13px/1 var(--font); margin: 0 0 8px; color: var(--muted); text-transform: uppercase; letter-spacing: .04em }
+.loglist .bet { border-radius: 10px }
+.status, .where { font-size: 12px; color: var(--muted); text-align: center; margin: 0 }
+svg text { fill: var(--muted); font: 600 11px var(--font) }
+@media (prefers-reduced-motion: no-preference) { .prog i { transition: width .4s ease } }
+
+.or { display: flex; align-items: center; gap: 10px; color: var(--muted); font-size: 13px }
+.or::before, .or::after { content: ""; flex: 1; height: 1px; background: var(--line) }
+.gbtn { display: flex; align-items: center; justify-content: center; gap: 10px }
+.acctline { display: flex; justify-content: space-between; align-items: center; gap: 10px; font-size: 14px }
+.acctline span { color: var(--muted); overflow-wrap: anywhere }
+.btn.small { width: auto; padding: 10px 14px; font-size: 14px }
+</style>
+</head>
+<body>
+<nav class="sitenav" aria-label="Site"><div class="in"><a class="brand" href="./" id="brand">The <b>Profit</b> Room</a><a class="tab" href="./">Record</a><a class="tab" href="bankroll.html" aria-current="page">My Bankroll</a></div></nav>
+<div class="wrap">
+  <header class="head">
+    <div class="bar1">
+      <div class="brand"><span class="mark" aria-hidden="true">PR</span><span>My Bankroll</span></div>
+      <span class="pill" id="recordTag" hidden></span>
+    </div>
+    <div class="bal"><div class="lbl">Betting bankroll</div><div class="amt" id="bankroll">$0</div></div>
+    <div class="stats">
+      <div class="stat"><span>Unit</span><b id="sUnit">–</b></div>
+      <div class="stat"><span>Won/lost</span><b id="sUnits">–</b></div>
+      <div class="stat"><span>Rainy day</span><b id="sRain">–</b></div>
+    </div>
+  </header>
+  <p class="status" id="status">Loading…</p>
+
+  <section class="card" id="auth" hidden>
+    <h2>Sign in</h2>
+    <p class="sub">Your bets save to your account, so they're on any phone or computer and never get wiped. Nobody else can see them.</p>
+    <label class="field"><span>Email</span><input id="aEmail" type="email" autocomplete="email" inputmode="email"></label>
+    <label class="field"><span>Password</span><input id="aPass" type="password" autocomplete="current-password" placeholder="6+ characters"></label>
+    <button class="btn main" id="aIn" type="button">Sign in</button>
+    <button class="btn ghost" id="aUp" type="button">Create account</button>
+    <button class="linkbtn" id="aForgot" type="button">Forgot password?</button>
+    <div class="or">or</div>
+    <button class="btn ghost gbtn" id="aGoogle" type="button">Continue with Google</button>
+    <p class="sub">Opened from Discord? Google sign-in only works after you tap ••• and open the page in Safari or Chrome. Email works anywhere.</p>
+    <p class="msg err" id="aErr" hidden></p><p class="msg ok" id="aOk" hidden></p>
+  </section>
+
+  <!-- first visit -->
+  <section class="card" id="setup" hidden>
+    <h2>Get started</h2>
+    <label class="field"><span>Your unit</span>
+      <div class="stake"><span class="cur">$</span><input id="uUnit" inputmode="decimal" placeholder="10" aria-describedby="uUnitHint"></div></label>
+    <p class="sub" id="uUnitHint">What you bet on a normal 1-unit play. Most people use 1 to 3% of their betting money.</p>
+    <label class="field"><span>Your betting money ($)</span><input id="uBank" inputmode="decimal" placeholder="Optional"></label>
+    <p class="sub">Everything in your FanDuel and DraftKings accounts. Leave blank and it uses 50 units.</p>
+    <label class="field"><span>Save for a rainy day (% of profit)</span><input id="uSave" inputmode="numeric" value="50"></label>
+    <p class="sub">At each unit check, this share of any new high gets set aside (only profit above your best bankroll so far, like a hedge fund's high-water mark). 50% while the bot is unproven; 25% once it has a winning track record.</p>
+    <button class="btn main" id="uGo" type="button">Start</button>
+    <p class="msg err" id="uErr" hidden></p>
+  </section>
+
+  <div id="main" class="wrap" style="padding:0" hidden>
+    <!-- unit -->
+    <section class="card" aria-labelledby="hUnit">
+      <div class="ch"><h2 id="hUnit">Your unit</h2><span class="unitbig" id="unitBig">$10</span></div>
+      <div class="odds" id="chips" role="group" aria-label="Pick an amount for the bet slip"></div>
+      <div id="checkDue"></div>
+      <div id="checkProg" style="display:flex;flex-direction:column;gap:8px">
+        <div class="row"><span class="k">Next unit check</span><span class="v" id="progTxt"></span></div>
+        <div class="prog" aria-hidden="true"><i id="progBar"></i></div>
+        <p class="sub" id="progHint"></p>
+        <p class="sub" id="ifToday"></p>
+      </div>
+    </section>
+
+    <!-- bet slip -->
+    <section class="card" id="slip" aria-labelledby="hSlip">
+      <div class="ch"><h2 id="hSlip">Bet slip</h2><span class="sub" id="kindTag"></span></div>
+      <details class="paste" id="pasteBox"><summary>+ Paste a Book Buster alert (optional)</summary>
+        <textarea id="paste" placeholder="In Discord: long-press the alert, Copy Text, paste here"></textarea>
+        <p class="msg ok" id="pasteOk" hidden></p>
+      </details>
+      <label class="field"><span>Wager</span>
+        <div class="stake"><span class="cur">$</span><input id="fStake" inputmode="decimal"><span class="u" id="pUnits">1 unit</span></div></label>
+      <div class="grid2">
+        <label class="field"><span>Odds</span><input id="fOdds" inputmode="numeric" value="-110"></label>
+        <label class="field"><span>Bet (optional)</span><input id="fDesc" placeholder="Any bet, e.g. Celtics +7" autocomplete="off"></label>
+      </div>
+      <div class="slipsum">
+        <div class="row"><span class="k">To win</span><span class="v" id="pWin">–</span></div>
+        <div class="row"><span class="k">Total payout</span><span class="v" id="pPay">–</span></div>
+      </div>
+      <p class="msg warn" id="pWarn" hidden></p>
+      <button class="btn main" id="place" type="button">Log bet</button>
+      <p class="msg err" id="formErr" hidden></p><p class="msg ok" id="formOk" hidden></p>
+    </section>
+
+    <!-- my bets -->
+    <section class="card" aria-labelledby="hBets">
+      <h2 id="hBets">My bets</h2>
+      <div class="tabs" role="tablist">
+        <button type="button" role="tab" id="tabOpen" aria-selected="true">Open</button>
+        <button type="button" role="tab" id="tabDone" aria-selected="false">Settled</button>
+      </div>
+      <div class="list" id="betList" role="tabpanel"></div>
+    </section>
+
+    <!-- account -->
+    <details class="card acct">
+      <summary>Account</summary>
+      <div class="more">
+        <div><h3>Profit over time</h3><div id="chart"></div></div>
+        <div><h3>Unit changes</h3><div class="list loglist" id="logList"></div></div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <h3 style="margin:0">Settings</h3>
+          <div class="grid2">
+            <label class="field"><span>Betting money now ($)</span><input id="sBank" inputmode="decimal"></label>
+            <label class="field"><span>Unit ($)</span><input id="sUnitIn" inputmode="decimal"></label>
+            <label class="field"><span>Rainy day % of profit</span><input id="sSave" inputmode="numeric"></label>
+            <label class="field"><span>Rainy day fund ($)</span><input id="sRainIn" inputmode="decimal"></label>
+          </div>
+          <p class="sub">Added or took out money? Fix "Betting money now". Saving starts a fresh 25-bet count.</p>
+          <button class="btn ghost" id="sGo" type="button">Save settings</button>
+          <p class="msg err" id="sErr" hidden></p><p class="msg ok" id="sOk" hidden></p>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <h3 style="margin:0">Signed in</h3>
+          <div class="acctline"><span id="who"></span><button class="btn ghost small" id="aOut" type="button">Sign out</button></div>
+        </div>
+      </div>
+    </details>
+  </div>
+
+  <p class="where"><span id="where"></span> <button class="linkbtn" id="aOut2" type="button" hidden style="font-size:12px">Sign out</button></p>
+</div>
+<script type="module" src="app.js"></script>
+</body>
+</html>
