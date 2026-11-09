@@ -4,26 +4,26 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>My Bankroll · Book Buster</title>
-<meta name="theme-color" content="#0a1422">
+<meta name="theme-color" content="#1e1f22">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Book Buster">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@500;700&family=Public+Sans:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
 <style>
-  /* one site, two pages: the same top bar on both */
-  .sitenav { position: sticky; top: 0; z-index: 20; background: #0a1422; border-bottom: 1px solid #24384f; }
-  .sitenav .in { max-width: 860px; margin: 0 auto; padding: 0 16px; display: flex; align-items: center; gap: 2px; height: 52px; }
-  .sitenav .brand { font: 700 1.2rem/1 "Saira Condensed", "Arial Narrow", sans-serif; color: #e8edf3; text-decoration: none;
-                    margin-right: auto; white-space: nowrap; }
-  .sitenav .brand b { color: #f2b33d; }
-  .sitenav .tab { color: #93a4b8; text-decoration: none; font: 600 .95rem/1 "Public Sans", system-ui, sans-serif;
-                  padding: 17px 10px 14px; border-bottom: 3px solid transparent; white-space: nowrap; }
-  .sitenav .tab:hover { color: #e8edf3; }
-  .sitenav .tab[aria-current="page"] { color: #e8edf3; border-bottom-color: #f2b33d; }
-  .sitenav a:focus-visible { outline: 2px solid #f2b33d; outline-offset: -2px; }
+  /* top bar: same as the Record page, the one title */
+  .sitenav { position: sticky; top: 0; z-index: 20; background: #1e1f22; border-bottom: 1px solid #111214; }
+  .sitenav .in { max-width: 1040px; margin: 0 auto; padding: 0 16px; height: 56px; display: flex; align-items: center; gap: 6px; }
+  .sitenav .brand { display: flex; align-items: center; gap: 10px; margin-right: auto; color: #f2f3f5; text-decoration: none;
+                    font: 800 1.12rem "Noto Sans", system-ui, sans-serif; white-space: nowrap; }
+  .sitenav .tab { color: #949ba4; text-decoration: none; font: 600 .92rem "Noto Sans", system-ui, sans-serif; padding: 7px 12px;
+                  border-radius: 6px; white-space: nowrap; }
+  .sitenav .tab:hover { background: #35373c; color: #dbdee1; }
+  .sitenav .tab[aria-current="page"] { background: #404249; color: #f2f3f5; }
+  .sitenav a:focus-visible { outline: 2px solid #f0b232; outline-offset: 2px; }
+  @media (max-width: 760px) { .sitenav .brand span { font-size: 1rem; } }
 
 /* Sportsbook-app layout: navy balance header, white cards, blue actions, bet slip, Open/Settled tabs */
 :root {
@@ -33,20 +33,20 @@
   --win: #0f8a43; --win-soft: #e4f6eb; --loss: #d1342f; --loss-soft: #fdeceb; --push: #6b7789;
   --rain: #0b7d89; --rain-soft: #e2f4f5;
   --shadow: 0 1px 2px rgba(15, 27, 45, .06), 0 2px 8px rgba(15, 27, 45, .05);
-  --font: "Inter", -apple-system, "Helvetica Neue", Arial, sans-serif;
+  --font: "Noto Sans", "Inter", -apple-system, "Helvetica Neue", Arial, sans-serif;
 }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
-  --bg: #07101d; --surface: #0f1b2c; --ink: #e8eef7; --muted: #93a3b8; --line: #1d2b40; --field: #0b1626;
-  --nav: #0a1a31; --nav-2: #15345c; --nav-muted: #93a8c4;
-  --blue: #4a98ff; --blue-ink: #04111f; --blue-soft: #11294a; --blue-line: #24508a;
-  --win: #3fcf7c; --win-soft: #0f2c1d; --loss: #ff6b62; --loss-soft: #361617; --push: #93a3b8;
-  --rain: #4fd0dc; --rain-soft: #0d2b30; --shadow: none; color-scheme: dark } }
+  --bg: #313338; --surface: #2b2d31; --ink: #dbdee1; --muted: #949ba4; --line: #3f4147; --field: #1e1f22;
+  --nav: #2b2d31; --nav-2: #2b2d31; --nav-muted: #949ba4;
+  --blue: #23a55a; --blue-ink: #ffffff; --blue-soft: #1d3a2a; --blue-line: #2d7d4f;
+  --win: #23a55a; --win-soft: #1d3a2a; --loss: #f23f43; --loss-soft: #3d2224; --push: #949ba4;
+  --rain: #f0b232; --rain-soft: #3a3020; --shadow: none; color-scheme: dark } }
 :root[data-theme="dark"] {
-  --bg: #07101d; --surface: #0f1b2c; --ink: #e8eef7; --muted: #93a3b8; --line: #1d2b40; --field: #0b1626;
-  --nav: #0a1a31; --nav-2: #15345c; --nav-muted: #93a8c4;
-  --blue: #4a98ff; --blue-ink: #04111f; --blue-soft: #11294a; --blue-line: #24508a;
-  --win: #3fcf7c; --win-soft: #0f2c1d; --loss: #ff6b62; --loss-soft: #361617; --push: #93a3b8;
-  --rain: #4fd0dc; --rain-soft: #0d2b30; --shadow: none; color-scheme: dark }
+  --bg: #313338; --surface: #2b2d31; --ink: #dbdee1; --muted: #949ba4; --line: #3f4147; --field: #1e1f22;
+  --nav: #2b2d31; --nav-2: #2b2d31; --nav-muted: #949ba4;
+  --blue: #23a55a; --blue-ink: #ffffff; --blue-soft: #1d3a2a; --blue-line: #2d7d4f;
+  --win: #23a55a; --win-soft: #1d3a2a; --loss: #f23f43; --loss-soft: #3d2224; --push: #949ba4;
+  --rain: #f0b232; --rain-soft: #3a3020; --shadow: none; color-scheme: dark }
 * { box-sizing: border-box }
 body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.45 var(--font); -webkit-font-smoothing: antialiased; font-feature-settings: "tnum" }
 [hidden] { display: none !important }
@@ -157,11 +157,17 @@ svg text { fill: var(--muted); font: 600 11px var(--font) }
 </style>
 </head>
 <body>
-<nav class="sitenav" aria-label="Site"><div class="in"><a class="brand" href="./" id="brand">Book <b>Buster</b></a><a class="tab" href="./">Record</a><a class="tab" href="bankroll.html" aria-current="page">My Bankroll</a></div></nav>
+<nav class="sitenav" aria-label="Site"><div class="in">
+  <a class="brand" href="./" aria-label="Book Buster home">
+    <svg width="30" height="30" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="15" fill="#0f2a1c" stroke="#23a55a" stroke-width="2"/><text x="16" y="22.5" text-anchor="middle" fill="#f0b232" style="font: 700 19px Georgia, serif">$</text></svg>
+    <span>Book Buster</span></a>
+  <a class="tab" href="./">Record</a><a class="tab" href="bankroll.html" aria-current="page">My Bankroll</a>
+</div></nav>
+<h1 class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">My Bankroll</h1>
 <div class="wrap">
   <header class="head">
     <div class="bar1">
-      <div class="brand"><span class="mark" aria-hidden="true">PR</span><span>My Bankroll</span></div>
+      <span></span>
       <span class="pill" id="recordTag" hidden></span>
     </div>
     <div class="bal"><div class="lbl">Betting bankroll</div><div class="amt" id="bankroll">$0</div></div>
