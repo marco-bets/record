@@ -19,6 +19,16 @@ export const logOut = () => (auth ? signOut(auth) : Promise.resolve()).then(() =
 
 // The top-bar button: "Log out" when signed in, "Log in" when not (the Record page is open to everyone)
 const btn = document.getElementById("navAuth");
+
+// Testing tab: only on a device where the owner has unlocked testing.html once (nobody else sees it)
+try {
+  const nav = document.querySelector(".sitenav .in");
+  if (localStorage.getItem("bb_tester") === "1" && nav && nav.querySelector(".tab") && !nav.querySelector('a[href="testing.html"]')) {
+    const a = document.createElement("a");
+    a.className = "tab"; a.href = "testing.html"; a.textContent = "Testing";
+    nav.insertBefore(a, btn && btn.parentNode === nav ? btn : null);
+  }
+} catch (e) { /* storage blocked: no tab, the link still works */ }
 function paint(user) {
   if (!btn) return;
   btn.classList.toggle("out", !!user);
