@@ -1,9 +1,7 @@
 // Book Buster Bankroll: each person signs in; their bets live in Firestore under users/<their id>,
 // which the security rules (firestore.rules) let only that person read or write.
-import { firebaseConfig } from "./config.js";
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword,
-  sendPasswordResetEmail, GoogleAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+import { app, auth, logOut } from "./session.js";          // one login for the whole site
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 import { initializeFirestore, persistentLocalCache, doc, collection, setDoc, deleteDoc, onSnapshot }
   from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
@@ -12,14 +10,11 @@ const CHECK_EVERY = 25, SWING = 0.2, STEPS = [0.5, 1, 1.5, 2];
 const S = { loaded: false, user: null, settings: null, bets: {}, units: 1, kind: "", stakeEdited: false, tab: "open", unsub: [] };
 
 // ---------- firebase ----------
-let auth, db;
-try {
-  if (!firebaseConfig || !firebaseConfig.apiKey || /PASTE/.test(firebaseConfig.apiKey)) throw new Error("config");
-  const app = initializeApp(firebaseConfig);
-  auth = getAuth(app);
+let db;
+if (app) {
   try { db = initializeFirestore(app, { localCache: persistentLocalCache() }); }
   catch (e) { db = initializeFirestore(app, {}); }
-} catch (e) {
+} else {
   $("status").textContent = "My Bankroll accounts open soon. The record is on the Record tab.";
 }
 
@@ -267,28 +262,8 @@ function listen() {
     const bets = {}; snap.forEach((x) => { bets[x.id] = { id: x.id, ...x.data() }; }); S.bets = bets; gotB = true; ready(); render(); }, fail));
 }
 
-// ---------- sign in ----------
-const authMsg = (e) => ({
-  "auth/invalid-credential": "Wrong email or password.", "auth/wrong-password": "Wrong email or password.", "auth/user-not-found": "No account with that email. Tap Create account.",
-  "auth/email-already-in-use": "That email already has an account. Tap Sign in.", "auth/weak-password": "Password needs at least 6 characters.",
-  "auth/invalid-email": "That email doesn't look right.", "auth/missing-password": "Enter a password.", "auth/too-many-requests": "Too many tries. Wait a minute and try again.",
-  "auth/popup-blocked": "Your browser blocked the Google window. Use email instead, or open the page in Safari or Chrome.",
-  "auth/popup-closed-by-user": "", "auth/cancelled-popup-request": "",
-  "auth/operation-not-supported-in-this-environment": "Google sign-in doesn't work in this browser. Use email, or open the page in Safari or Chrome.",
-  "auth/network-request-failed": "No connection. Try again.",
-}[e && e.code] ?? "Couldn't sign in. Try again.");
-const creds = () => [$("aEmail").value.trim(), $("aPass").value];
-async function tryAuth(fn) { showMsg("aErr", ""); showMsg("aOk", ""); try { await fn(); } catch (e) { console.error(e); showMsg("aErr", authMsg(e)); } }
-$("aIn").onclick = () => tryAuth(() => signInWithEmailAndPassword(auth, ...creds()));
-$("aUp").onclick = () => tryAuth(() => createUserWithEmailAndPassword(auth, ...creds()));
-$("aGoogle").onclick = () => tryAuth(() => signInWithPopup(auth, new GoogleAuthProvider()));
-$("aForgot").onclick = () => tryAuth(async () => {
-  const email = $("aEmail").value.trim();
-  if (!email) return showMsg("aErr", "Type your email above first.");
-  await sendPasswordResetEmail(auth, email); showMsg("aOk", "Check your email for a reset link.");
-});
-$("aPass").addEventListener("keydown", (e) => { if (e.key === "Enter") $("aIn").click(); });
-$("aOut").onclick = $("aOut2").onclick = () => signOut(auth);
+// ---------- sign out (logging in happens on login.html) ----------
+$("aOut").onclick = $("aOut2").onclick = () => logOut();
 
 if (auth) onAuthStateChanged(auth, (u) => {
   S.authKnown = true; S.user = u; S.settings = null; S.bets = {}; S.loaded = false;
