@@ -184,6 +184,7 @@ async function go() {
   } catch (e) {
     $("err").textContent = "Wrong password."; $("err").hidden = false; return;
   }
+  try { localStorage.setItem("bb_tester", "1"); } catch (e) {}   // show the Testing tab on this device
   $("lock").hidden = true;
   $("meta").hidden = false;
   $("meta").textContent = `Updated ${day(dt(DATA.updated))} at ${time(dt(DATA.updated))}. Only you can see this page.`;
