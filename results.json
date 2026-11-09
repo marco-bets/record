@@ -1,14 +1,14 @@
 {
  "name": "The Profit Room",
- "updated": "2026-11-08T02:14:59-05:00",
+ "updated": "2026-11-09T00:41:26-05:00",
  "since": "2026-11-04",
  "proven": {
   "record": {
-   "wins": 1,
-   "losses": 0,
+   "wins": 3,
+   "losses": 3,
    "pushes": 0,
-   "units": 0.23,
-   "roi": 0.92
+   "units": -0.08,
+   "roi": -0.0533
   },
   "bets": [
    {
@@ -23,6 +23,71 @@
     "stake": 0.25,
     "result": "win",
     "units": 0.23
+   },
+   {
+    "posted": "2026-11-08T07:00:17-05:00",
+    "start": "2026-11-08T12:00:00-05:00",
+    "group": "Top 5 board",
+    "sent": true,
+    "bet": "Under 151.5 (-108)",
+    "book": "DraftKings",
+    "game": "Iona Gaels @ St. John's Red Storm",
+    "final": "65-104",
+    "stake": 0.25,
+    "result": "loss",
+    "units": -0.25
+   },
+   {
+    "posted": "2026-11-08T07:00:17-05:00",
+    "start": "2026-11-08T13:00:00-05:00",
+    "group": "Top 5 board",
+    "sent": true,
+    "bet": "Commanders +4.5 (+100)",
+    "book": "DraftKings",
+    "game": "Rams @ Commanders",
+    "final": "20-13",
+    "stake": 0.25,
+    "result": "loss",
+    "units": -0.25
+   },
+   {
+    "posted": "2026-11-08T07:00:17-05:00",
+    "start": "2026-11-08T13:00:00-05:00",
+    "group": "Top 5 board",
+    "sent": true,
+    "bet": "Colts +5.5 (-115)",
+    "book": "DraftKings",
+    "game": "Cowboys @ Colts",
+    "final": "27-23",
+    "stake": 0.25,
+    "result": "win",
+    "units": 0.22
+   },
+   {
+    "posted": "2026-11-08T07:00:17-05:00",
+    "start": "2026-11-08T19:30:00-05:00",
+    "group": "Top 5 board",
+    "sent": true,
+    "bet": "Over 219.5 (-113)",
+    "book": "DraftKings",
+    "game": "Nets @ Mavericks",
+    "final": "93-130",
+    "stake": 0.25,
+    "result": "win",
+    "units": 0.22
+   },
+   {
+    "posted": "2026-11-08T07:00:17-05:00",
+    "start": "2026-11-08T20:00:00-05:00",
+    "group": "Top 5 board",
+    "sent": true,
+    "bet": "Over 221.5 (-110)",
+    "book": "DraftKings",
+    "game": "Celtics @ Bucks",
+    "final": "117-97",
+    "stake": 0.25,
+    "result": "loss",
+    "units": -0.25
    }
   ],
   "tested": {}
