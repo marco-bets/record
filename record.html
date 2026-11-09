@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Book Buster</title>
+<meta name="description" content="Every pick posted, graded automatically. Nothing deleted.">
+<meta name="theme-color" content="#1570ef">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  /* top bar: the one title on every page */
+  .sitenav { position: sticky; top: 0; z-index: 20; background: #1570ef; box-shadow: 0 1px 0 rgba(0,0,0,.08); }
+  .sitenav .in { max-width: 880px; margin: 0 auto; padding: 0 16px; display: flex; align-items: center; gap: 2px; height: 56px; }
+  .sitenav .brand { font: 800 1.2rem/1 "Inter", system-ui, sans-serif; color: #fff; text-decoration: none; letter-spacing: -.02em;
+                    margin-right: auto; white-space: nowrap; display: block; }
+  .sitenav .tab { color: rgba(255,255,255,.78); text-decoration: none; font: 600 .9rem/1 "Inter", system-ui, sans-serif;
+                  padding: 20px 9px 17px; border-bottom: 3px solid transparent; white-space: nowrap; }
+  .sitenav .tab:hover { color: #fff; }
+  .sitenav .tab[aria-current="page"] { color: #fff; border-bottom-color: #fff; }
+  .sitenav .login { margin-left: 8px; font: 700 .85rem/1 "Inter", system-ui, sans-serif; color: #1570ef; background: #fff;
+                    text-decoration: none; padding: 9px 13px; border-radius: 999px; white-space: nowrap; }
+  .sitenav .login.out { background: transparent; color: #fff; box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.7); }
+  .sitenav a:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+  @media (max-width: 400px) { .sitenav .brand { font-size: 1.05rem; } .sitenav .tab { padding-left: 6px; padding-right: 6px; font-size: .84rem; } }
+  :root {
+    --bg: #eef1f5; --card: #ffffff; --ink: #0f1b2d; --muted: #5d6b7e; --line: #e2e7ee; --soft: #f4f6f9;
+    --blue: #1570ef; --blue-soft: #e9f2fe; --win: #0f8a43; --win-soft: #e4f6eb; --loss: #d1342f; --loss-soft: #fdeceb;
+    --shadow: 0 1px 2px rgba(15,27,45,.06), 0 2px 8px rgba(15,27,45,.05);
+    --font: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html, body { background: var(--bg); }
+  body { margin: 0; color: var(--ink); font: 15px/1.5 var(--font); -webkit-font-smoothing: antialiased; font-feature-settings: "tnum"; }
+  :focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+  /* league bar, like a sportsbook's sport menu */
+  .leagues { background: #fff; border-bottom: 1px solid var(--line); position: sticky; top: 56px; z-index: 10; }
+  .leagues .in { max-width: 880px; margin: 0 auto; padding: 10px 16px; display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; }
+  .leagues .in::-webkit-scrollbar { display: none; }
+  .leagues button { flex: none; font: 600 .88rem var(--font); color: var(--ink); background: var(--soft); border: 1px solid var(--line);
+                    border-radius: 999px; padding: 8px 16px; cursor: pointer; }
+  .leagues button[aria-pressed="true"] { background: var(--blue); border-color: var(--blue); color: #fff; }
+
+  main { max-width: 880px; margin: 0 auto; padding: 16px 16px 64px; display: flex; flex-direction: column; gap: 14px; }
+  .card { background: var(--card); border-radius: 14px; box-shadow: var(--shadow); padding: 16px; }
+  .card h2 { margin: 0 0 12px; font-size: 1rem; font-weight: 700; }
+  .meta { color: var(--muted); font-size: .82rem; margin: 0; }
+
+  .summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .stat { background: var(--soft); border-radius: 10px; padding: 12px; min-width: 0; }
+  .stat span { display: block; color: var(--muted); font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; }
+  .stat b { display: block; font-size: clamp(1.5rem, 6vw, 2.1rem); font-weight: 800; letter-spacing: -.02em; line-height: 1.15; }
+  .stat b.pos { color: var(--win); } .stat b.neg { color: var(--loss); }
+  .chart svg { display: block; width: 100%; height: 170px; }
+
+  table.split { width: 100%; border-collapse: collapse; }
+  .split th, .split td { text-align: left; padding: 10px 2px; border-bottom: 1px solid var(--line); }
+  .split tr:last-child td { border-bottom: 0; }
+  .split th { color: var(--muted); font-weight: 600; font-size: .78rem; }
+  .split td:not(:first-child), .split th:not(:first-child) { text-align: right; }
+  .split td.pos { color: var(--win); font-weight: 700; } .split td.neg { color: var(--loss); font-weight: 700; }
+
+  .types { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 10px; }
+  .types button { font: 600 .8rem var(--font); color: var(--muted); background: #fff; border: 1px solid var(--line);
+                  border-radius: 999px; padding: 6px 12px; cursor: pointer; }
+  .types button[aria-pressed="true"] { color: var(--blue); border-color: var(--blue); background: var(--blue-soft); }
+
+  /* picks look like settled bet slips */
+  ol.ledger { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+  .slip { border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; display: grid; grid-template-columns: 1fr auto; gap: 2px 12px; }
+  .slip .what { font-weight: 700; font-size: 1rem; }
+  .slip .tag { display: inline-block; margin-left: 6px; font-size: .7rem; font-weight: 700; color: var(--blue); background: var(--blue-soft);
+               padding: 2px 7px; border-radius: 999px; vertical-align: 2px; }
+  .slip .sub { color: var(--muted); font-size: .83rem; grid-column: 1; }
+  .res { grid-row: 1 / span 2; grid-column: 2; text-align: right; }
+  .pill { display: inline-block; font-size: .72rem; font-weight: 800; letter-spacing: .04em; padding: 4px 9px; border-radius: 999px; }
+  .win .pill { color: var(--win); background: var(--win-soft); } .loss .pill { color: var(--loss); background: var(--loss-soft); }
+  .push .pill { color: var(--muted); background: var(--soft); }
+  .u { display: block; font-weight: 800; font-size: 1.05rem; margin-top: 4px; }
+  .win .u { color: var(--win); } .loss .u { color: var(--loss); } .push .u { color: var(--muted); }
+  .empty { color: var(--muted); margin: 0; }
+  footer { color: var(--muted); font-size: .76rem; max-width: 70ch; padding: 4px 2px; }
+
+  @media (max-width: 560px) {
+    .summary { grid-template-columns: 1fr 1fr; }
+    .summary .stat:first-child { grid-column: 1 / -1; }
+  }
+
+  /* signed-in pages stay hidden until the login check finishes (no flash of content) */
+  body[data-gate]:not(.ok) > :not(nav) { visibility: hidden; }
+</style>
+</head>
+<body data-gate>
+<script>setTimeout(() => document.body.classList.add("ok"), 6000)   // never stay blank if the login check can't load</script>
+<nav class="sitenav" aria-label="Site"><div class="in"><a class="brand" href="bankroll.html">Book Buster</a><a class="tab" href="record.html" aria-current="page">Record</a><a class="tab" href="bankroll.html">My Bankroll</a><a class="login out" id="navAuth" href="./">Log out</a></div></nav>
+<div class="leagues"><div class="in" id="leagues" role="group" aria-label="League"></div></div>
+<main>
+  <h1 class="sr">Book Buster track record</h1>
+  <p class="meta" id="meta">Loading the record…</p>
+  <div id="view"></div>
+  <footer>
+    Every pick sent to members, graded when the game ends. Wins and losses both stay up; nothing gets deleted.
+    A unit is whatever amount you choose to bet; results are in units so they fit any bankroll.
+    Past results don't guarantee future results. For entertainment only, not financial advice. 21+ where legal. Need help? 1-800-GAMBLER.
+  </footer>
+</main>
+<script type="module" src="session.js"></script>
+<script>
+const fmtU = u => (u >= 0 ? "+" : "−") + Math.abs(u).toFixed(1) + "u";
+const dt = s => new Date(s);
+const day = d => d.toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" });
+const time = d => d.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" });
+const pct = r => (r >= 0 ? "+" : "−") + Math.abs(r * 100).toFixed(1) + "%";
+const esc = t => String(t).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const wl = g => [g.filter(b => b.result === "win").length, g.filter(b => b.result === "loss").length];
+const cls = v => v == null ? "" : v > 0 ? "pos" : v < 0 ? "neg" : "";
+function record(bets) {
+  const [w, l] = wl(bets), p = bets.filter(b => b.result === "push").length;
+  const risked = bets.filter(b => b.result !== "push").reduce((s, b) => s + b.stake, 0);
+  const units = bets.reduce((s, b) => s + b.units, 0);
+  return { wins: w, losses: l, pushes: p, units, roi: risked ? units / risked : null };
+}
+let DATA, LEAGUE = "All";
+
+function leagues() {
+  const el = document.getElementById("leagues");
+  el.innerHTML = ["All", ...DATA.leagues].map(l => `<button type="button" aria-pressed="${l === LEAGUE}">${esc(l)}</button>`).join("");
+}
+
+function draw() {
+  leagues();
+  const bets = DATA.bets.filter(b => LEAGUE === "All" || b.sport === LEAGUE);
+  const view = document.getElementById("view");
+  if (!bets.length) {
+    view.innerHTML = `<section class="card"><p class="empty">No finished ${LEAGUE === "All" ? "" : esc(LEAGUE) + " "}picks yet. Results show up the night each game ends.</p></section>`;
+    return;
+  }
+  const r = record(bets);
+  let run = 0; const pts = [0, ...bets.map(b => (run += b.units))];
+  const lo = Math.min(0, ...pts), hi = Math.max(0, ...pts), span = (hi - lo) || 1;
+  const x = i => (i / (pts.length - 1)) * 790 + 5, y = v => 162 - ((v - lo) / span) * 152;
+  const path = pts.map((v, i) => `${i ? "L" : "M"}${x(i).toFixed(1)},${y(v).toFixed(1)}`).join("");
+  const groups = {};
+  for (const b of bets) (groups[b.group] ??= []).push(b);
+  const rows = Object.entries(groups).map(([k, g]) => {
+    const [w, l] = wl(g), u = g.reduce((s, b) => s + b.units, 0);
+    return `<tr><td>${esc(k)}</td><td>${w}-${l}</td><td>${w + l ? Math.round(w / (w + l) * 100) + "%" : "n/a"}</td><td class="${cls(u)}">${fmtU(u)}</td></tr>`;
+  }).join("");
+  view.innerHTML = `
+    <section class="card"><div class="summary">
+      <div class="stat"><span>Record</span><b>${r.wins}-${r.losses}${r.pushes ? "-" + r.pushes : ""}</b></div>
+      <div class="stat"><span>Units</span><b class="${cls(r.units)}">${fmtU(r.units)}</b></div>
+      <div class="stat"><span>Return per unit</span><b class="${cls(r.roi)}">${r.roi == null ? "n/a" : pct(r.roi)}</b></div></div></section>
+    <section class="card chart"><h2>Units over time</h2>
+      <svg viewBox="0 0 800 170" preserveAspectRatio="none" role="img" aria-label="Running units won">
+      <line x1="0" x2="800" y1="${y(0)}" y2="${y(0)}" stroke="#c9d2de" stroke-dasharray="4 5"/>
+      <path d="${path}" fill="none" stroke="${run >= 0 ? "#0f8a43" : "#d1342f"}" stroke-width="3" vector-effect="non-scaling-stroke" stroke-linejoin="round"/></svg></section>
+    <section class="card"><h2>By bet type</h2>
+      <table class="split"><thead><tr><th scope="col">Bet type</th><th scope="col">Record</th><th scope="col">Win rate</th><th scope="col">Units</th></tr></thead>
+      <tbody>${rows}</tbody></table></section>
+    <section class="card"><h2>Every pick</h2>
+      <div class="types" role="group" aria-label="Show bet type">${["All types", ...Object.keys(groups)].map((t, i) =>
+        `<button type="button" aria-pressed="${i === 0}">${esc(t)}</button>`).join("")}</div>
+      <ol class="ledger"></ol></section>`;
+  const f = view.querySelector(".types"), ledger = view.querySelector(".ledger");
+  const list = t => {
+    ledger.innerHTML = bets.filter(b => t === "All types" || b.group === t).slice().reverse().map(b => {
+      const s = dt(b.start), p = dt(b.posted);
+      return `<li class="slip ${b.result}">
+        <div class="what">${esc(b.bet)}<span class="tag">${esc(b.sport)}</span></div>
+        <div class="res"><span class="pill">${b.result === "win" ? "WON" : b.result === "loss" ? "LOST" : "PUSH"}</span><span class="u">${fmtU(b.units)}</span></div>
+        <div class="sub">${esc(b.game)} · Final ${esc(b.final)}</div>
+        <div class="sub">${esc(b.group)} · ${esc(b.book)} · ${b.stake === 1 ? "1 unit" : b.stake + " units"}</div>
+        <div class="sub">Posted ${day(p)} ${time(p)} · Started ${time(s)}</div></li>`;
+    }).join("");
+  };
+  f.addEventListener("click", e => {
+    if (e.target.tagName !== "BUTTON") return;
+    f.querySelectorAll("button").forEach(btn => btn.setAttribute("aria-pressed", btn === e.target));
+    list(e.target.textContent);
+  });
+  list("All types");
+}
+
+document.getElementById("leagues").addEventListener("click", e => {
+  if (e.target.tagName !== "BUTTON" || !DATA) return;
+  LEAGUE = e.target.textContent; draw();
+});
+fetch("results.json", { cache: "no-store" }).then(r => r.json()).then(d => {
+  DATA = d; d.leagues = d.leagues || [];
+  document.title = `${d.name} · Record`;
+  document.getElementById("meta").textContent =
+    `Tracking since ${day(dt(d.since + "T12:00:00"))} · Updated ${day(dt(d.updated))} at ${time(dt(d.updated))}`;
+  draw();
+}).catch(() => { document.getElementById("meta").textContent = "Results couldn't load. Refresh the page in a minute."; });
+</script>
+</body>
+</html>
