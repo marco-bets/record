@@ -3,12 +3,26 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Results</title>
+<title>The Profit Room</title>
 <meta name="description" content="Every pick posted, graded automatically. Nothing deleted.">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-180.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@500;700&family=Public+Sans:wght@400;600&display=swap" rel="stylesheet">
 <style>
+  /* one site, two pages: the same top bar on both */
+  .sitenav { position: sticky; top: 0; z-index: 20; background: #0a1422; border-bottom: 1px solid #24384f; }
+  .sitenav .in { max-width: 860px; margin: 0 auto; padding: 0 16px; display: flex; align-items: center; gap: 2px; height: 52px; }
+  .sitenav .brand { font: 700 1.2rem/1 "Saira Condensed", "Arial Narrow", sans-serif; color: #e8edf3; text-decoration: none;
+                    margin-right: auto; white-space: nowrap; }
+  .sitenav .brand b { color: #f2b33d; }
+  .sitenav .tab { color: #93a4b8; text-decoration: none; font: 600 .95rem/1 "Public Sans", system-ui, sans-serif;
+                  padding: 17px 10px 14px; border-bottom: 3px solid transparent; white-space: nowrap; }
+  .sitenav .tab:hover { color: #e8edf3; }
+  .sitenav .tab[aria-current="page"] { color: #e8edf3; border-bottom-color: #f2b33d; }
+  .sitenav a:focus-visible { outline: 2px solid #f2b33d; outline-offset: -2px; }
+
   :root {
     --ink: #0f1b2d;
     --panel: #15253b;
@@ -24,7 +38,7 @@
   * { box-sizing: border-box; }
   html { background: var(--ink); }
   body { margin: 0; background: var(--ink); color: var(--text); font: 16px/1.55 var(--body); }
-  main { max-width: 860px; margin: 0 auto; padding: 40px 16px 64px; }
+  main { max-width: 860px; margin: 0 auto; padding: 28px 16px 64px; }
   a { color: var(--gold); }
   :focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
 
@@ -83,6 +97,7 @@
 </style>
 </head>
 <body>
+<nav class="sitenav" aria-label="Site"><div class="in"><a class="brand" href="./" id="brand">The <b>Profit</b> Room</a><a class="tab" href="./" aria-current="page">Record</a><a class="tab" href="bankroll.html">My Bankroll</a></div></nav>
 <main>
   <header>
     <h1 id="name">Results</h1>
