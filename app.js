@@ -65,7 +65,7 @@ function parseAlert(raw) {
     const leg = (x) => x.replace(/\(vs [^)]*\)/i, "").trim();
     return { kind: "Teaser", bet: `${leg(tz[1])} / ${leg(tz[2])} (6-pt teaser)`, odds: -120, book: "DraftKings", units: parseFloat(tz[3]) };
   }
-  const head = t.match(/(DAILY LEAN|BET OF THE DAY|VALUE BET|TOTAL|LIVE|MIDDLE|LEAN|BET|Best bet):\s*(.+?)\s*\(([+-]\d{3,4})\)(?:\*\*)?(?:\s*on\s+(FanDuel|DraftKings))?/i);
+  const head = t.match(/(DAILY PICK|DAILY LEAN|BET OF THE DAY|VALUE BET|TOTAL|LIVE|MIDDLE|LEAN|BET|Best bet):\s*(.+?)\s*\(([+-]\d{3,4})\)(?:\*\*)?(?:\s*on\s+(FanDuel|DraftKings))?/i);
   if (!head) {
     // a line from the 📋 Top 5 board: "1. Under 150.5 (-110) on FanDuel ... · quarter unit"
     const row = t.match(/^\s*(\d)\.\s*(.+?)\s*\(([+-]\d{3,4})\)\s*on\s+(FanDuel|DraftKings)[^\n]*\n?([^\n]*)/m);
@@ -75,7 +75,7 @@ function parseAlert(raw) {
              units: /half unit/i.test(tagline) ? 0.5 : 0.25 };
   }
   const k = head[1].toLowerCase();
-  const out = { kind: k === "daily lean" ? "Daily lean" : k === "bet of the day" ? "Bet of the day" : k === "value bet" ? "Value bet" : k === "total" ? "NFL total" : k === "live" ? "Live" : k === "middle" ? "Middle" :
+  const out = { kind: (k === "daily lean" || k === "daily pick") ? "Daily pick" : k === "bet of the day" ? "Bet of the day" : k === "value bet" ? "Value bet" : k === "total" ? "NFL total" : k === "live" ? "Live" : k === "middle" ? "Middle" :
     k === "lean" ? "Lean" : k === "best bet" ? "NFL best bet" : "Bet", bet: head[2].trim(), odds: parseInt(head[3], 10), book: book(head[4]) };
   const sp = t.match(/\((NBA|NFL|CFB|CBB|MLB),/);
   const college = sp && (sp[1] === "CBB" || sp[1] === "CFB");
