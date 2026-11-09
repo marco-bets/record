@@ -14,7 +14,10 @@
 <style>
   /* top bar: the one title on every page */
   .sitenav { position: sticky; top: 0; z-index: 20; background: #1570ef; box-shadow: 0 1px 0 rgba(0,0,0,.08); }
-  .sitenav .in { max-width: 880px; margin: 0 auto; padding: 0 16px; display: flex; align-items: center; gap: 2px; height: 56px; }
+  .sitenav .in { max-width: 880px; margin: 0 auto; padding: 0 16px; display: flex; align-items: center; gap: 2px; height: 56px;
+                overflow-x: auto; overflow-y: hidden; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+  .sitenav .in::-webkit-scrollbar { display: none; }   /* v111: the bar scrolls sideways on phones, nothing gets cut off */
+  .sitenav .brand, .sitenav .tab, .sitenav .login { flex-shrink: 0; }
   .sitenav .brand { font: 800 1.2rem/1 "Inter", system-ui, sans-serif; color: #fff; text-decoration: none; letter-spacing: -.02em;
                     margin-right: auto; white-space: nowrap; display: block; }
   .sitenav .tab { color: rgba(255,255,255,.78); text-decoration: none; font: 600 .9rem/1 "Inter", system-ui, sans-serif;
@@ -23,7 +26,8 @@
   .sitenav .tab[aria-current="page"] { color: #fff; border-bottom-color: #fff; }
   .sitenav .login { margin-left: 8px; font: 700 .85rem/1 "Inter", system-ui, sans-serif; color: #1570ef; background: #fff;
                     text-decoration: none; padding: 9px 13px; border-radius: 999px; white-space: nowrap; }
-  .sitenav .login.out { background: transparent; color: #fff; box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.7); }
+  .sitenav .login.out { background: #1570ef; color: #fff; box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.7), -14px 0 12px 4px #1570ef; }
+  .sitenav .login { position: sticky; right: 0; }   /* Log out stays put while the tabs scroll under it */
   .sitenav a:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
   @media (max-width: 400px) { .sitenav .brand { font-size: 1.05rem; } .sitenav .tab { padding-left: 6px; padding-right: 6px; font-size: .84rem; } }
   :root {
