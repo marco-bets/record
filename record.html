@@ -103,6 +103,7 @@
   <h1 class="sr">Book Buster track record</h1>
   <p class="meta" id="meta">Loading the record…</p>
   <div id="view"></div>
+  <p class="meta" id="retired" hidden></p>
   <footer>
     Every pick sent to members, graded when the game ends. Wins and losses both stay up; nothing gets deleted.
     A unit is whatever amount you choose to bet; results are in units so they fit any bankroll.
@@ -196,6 +197,9 @@ fetch("results.json", { cache: "no-store" }).then(r => r.json()).then(d => {
   document.title = `${d.name} · Record`;
   document.getElementById("meta").textContent =
     `Tracking since ${day(dt(d.since + "T12:00:00"))} · Updated ${day(dt(d.updated))} at ${time(dt(d.updated))}`;
+  const ret = (d.retired || []).map(r => `${esc(r.group)} (${day(dt(r.first))}${r.first.slice(0, 10) === r.last.slice(0, 10) ? "" : " to " + day(dt(r.last))}): ${r.wins}-${r.losses}, ${fmtU(r.units)}`);
+  if (ret.length) { const el = document.getElementById("retired"); el.hidden = false;
+    el.textContent = "Retired pick types, no longer sent and not counted above: " + ret.join("; ") + "."; }
   draw();
 }).catch(() => { document.getElementById("meta").textContent = "Results couldn't load. Refresh the page in a minute."; });
 </script>
