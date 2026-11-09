@@ -158,10 +158,14 @@ svg text { fill: var(--muted); font: 600 11px var(--font) }
 .acctline { display: flex; justify-content: space-between; align-items: center; gap: 10px; font-size: 14px }
 .acctline span { color: var(--muted); overflow-wrap: anywhere }
 .btn.small { width: auto; padding: 10px 14px; font-size: 14px }
+
+  /* signed-in pages stay hidden until the login check finishes (no flash of content) */
+  body[data-gate]:not(.ok) > :not(nav) { visibility: hidden; }
 </style>
 </head>
-<body>
-<nav class="sitenav" aria-label="Site"><div class="in"><a class="brand" href="./">Book Buster</a><a class="tab" href="./">Record</a><a class="tab" href="bankroll.html" aria-current="page">My Bankroll</a><a class="login" id="navAuth" href="login.html">Log in</a></div></nav>
+<body data-gate>
+<script>setTimeout(() => document.body.classList.add("ok"), 6000)   // never stay blank if the login check can't load</script>
+<nav class="sitenav" aria-label="Site"><div class="in"><a class="brand" href="bankroll.html">Book Buster</a><a class="tab" href="record.html">Record</a><a class="tab" href="bankroll.html" aria-current="page">My Bankroll</a><a class="login out" id="navAuth" href="./">Log out</a></div></nav>
 <h1 style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">My Bankroll</h1>
 <div class="wrap">
   <header class="head">
@@ -181,7 +185,7 @@ svg text { fill: var(--muted); font: 600 11px var(--font) }
   <section class="card" id="auth" hidden>
     <h2>Log in to use My Bankroll</h2>
     <p class="sub">Your bets save to your account, so they're on any phone or computer and never get wiped. Nobody else can see them.</p>
-    <a class="btn main" href="login.html?next=bankroll.html" style="text-align:center;text-decoration:none">Log in or create an account</a>
+    <a class="btn main" href="./?next=bankroll.html" style="text-align:center;text-decoration:none">Log in or create an account</a>
   </section>
 
   <!-- first visit -->
