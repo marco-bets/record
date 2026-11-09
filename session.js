@@ -17,8 +17,16 @@ const page = () => location.pathname.split("/").pop() || "index.html";
 const gated = document.body.hasAttribute("data-gate");
 export const logOut = () => (auth ? signOut(auth) : Promise.resolve()).then(() => location.replace("./"));
 
+// The top-bar button: "Log out" when signed in, "Log in" when not (the Record page is open to everyone)
 const btn = document.getElementById("navAuth");
-if (btn) btn.onclick = (e) => { e.preventDefault(); logOut(); };
+function paint(user) {
+  if (!btn) return;
+  btn.classList.toggle("out", !!user);
+  btn.textContent = user ? "Log out" : "Log in";
+  btn.title = user ? (user.email || "") : "";
+  btn.href = user ? "#" : "./?next=bankroll.html";
+  btn.onclick = user ? (e) => { e.preventDefault(); logOut(); } : null;
+}
 
 if (!auth) {
   document.body.classList.add("ok");                      // accounts not switched on yet: show the page
@@ -26,7 +34,7 @@ if (!auth) {
 } else {
   onAuthStateChanged(auth, (user) => {
     if (!user && gated) { location.replace("./?next=" + encodeURIComponent(page())); return; }
-    if (btn && user) btn.title = user.email || "";
+    paint(user);
     document.body.classList.add("ok");
   });
 }
