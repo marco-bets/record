@@ -132,6 +132,24 @@
     .tlist .n { text-align: left; font-weight: 600; }
     .tlist .n small { display: block; color: var(--muted); font-size: .68rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; }
   }
+  /* v114: 📍 Post a Daily Pick (phone-friendly form) */
+  .pickform h2 { margin-bottom: 4px; }
+  .pickform form { margin-top: 12px; }
+  .pickform .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 12px; }
+  .pickform label { display: flex; flex-direction: column; gap: 5px; font-size: .78rem; font-weight: 700; color: var(--muted); min-width: 0; }
+  .pickform .wide { grid-column: 1 / -1; }
+  .pickform input, .pickform select, .pickform textarea { font: 16px var(--font); color: var(--ink); padding: 11px 12px; border-radius: 10px;
+    border: 1px solid var(--line); background: var(--soft); width: 100%; min-width: 0; }
+  .pickform textarea { resize: vertical; }
+  .pickform input:focus, .pickform select:focus, .pickform textarea:focus { outline: 2px solid var(--blue); border-color: transparent; }
+  .pickform .btn { width: 100%; margin-top: 14px; }
+  .pickform .btn:disabled { opacity: .55; cursor: default; }
+  .pf-msg { margin: 10px 0 0; font-size: .88rem; font-weight: 600; }
+  .pf-msg.ok { color: var(--win); } .pf-msg.bad { color: var(--loss); }
+  .pf-recent { margin: 14px 0 0; padding: 0; list-style: none; border-top: 1px solid var(--line); }
+  .pf-recent li { padding: 9px 0; border-bottom: 1px solid var(--line); font-size: .85rem; overflow-wrap: anywhere; }
+  .pf-recent li span { display: block; color: var(--muted); font-size: .76rem; }
+  @media (min-width: 760px) { .pickform .grid { grid-template-columns: repeat(4, 1fr); } }
   [hidden] { display: none !important; }
   .adminbar { margin: 0 0 6px; font-size: .8rem; font-weight: 700; color: #8a5a00; background: #fdf3dc; padding: 8px 12px; border-radius: 10px; }
   .private { display: inline-block; font-size: .72rem; font-weight: 800; color: var(--loss); background: var(--loss-soft); padding: 3px 9px; border-radius: 999px; }
@@ -152,6 +170,27 @@
   </section>
   <p class="adminbar" id="adminbar" hidden>🔒 For Admin use only. Members can't see this page or its tab.</p>
   <p class="meta" id="meta" hidden></p>
+  <section class="card pickform" id="pickform" hidden>
+    <h2>📍 Post a Daily Pick</h2>
+    <p class="meta">Posts to #daily-picks within a few minutes while the bot is running (7 AM until the last game), then it's graded and tracked like the bot's picks. Send it before 7 AM and it posts at 7, and the bot skips its own pick that day.</p>
+    <p class="pf-msg bad" id="pf-login" hidden>Log in with your admin email to post picks. <a href="./?next=testing.html">Log in</a></p>
+    <form id="pf" novalidate>
+      <div class="grid">
+        <label>Sport<select name="sport"><option>NBA</option><option>CBB</option><option>NFL</option><option>CFB</option><option>NHL</option><option>MLB</option></select></label>
+        <label>Bet type<select name="market" id="pf-market"><option value="spread">Spread</option><option value="total">Total (Over/Under)</option><option value="moneyline">Moneyline</option></select></label>
+        <label class="wide"><span id="pf-teamlab">Team you're betting</span><input name="team" placeholder="e.g. Celtics" autocomplete="off" autocapitalize="words"></label>
+        <label id="pf-ou" hidden>Over or Under<select name="ou"><option>Over</option><option>Under</option></select></label>
+        <label id="pf-line">Line<input name="line" placeholder="-3.5" autocomplete="off"></label>
+        <label>Odds<input name="odds" placeholder="-110" autocomplete="off"></label>
+        <label>Book<select name="book"><option value="fanduel">FanDuel</option><option value="draftkings">DraftKings</option></select></label>
+        <label>Stake (units)<input name="stake" value="0.25" autocomplete="off"></label>
+        <label class="wide">Why (1 to 2 lines, optional)<textarea name="why" maxlength="200" rows="2"></textarea></label>
+      </div>
+      <button class="btn" type="submit" id="pf-go">Post pick</button>
+      <p class="pf-msg" id="pf-msg" role="status"></p>
+    </form>
+    <ul class="pf-recent" id="pf-recent" hidden></ul>
+  </section>
   <div id="view"></div>
 </main>
 <script>
@@ -218,6 +257,7 @@ async function go() {
   $("meta").hidden = false;
   $("meta").textContent = `Updated ${day(dt(DATA.updated))} at ${time(dt(DATA.updated))}.`;
   draw();
+  window.dispatchEvent(new CustomEvent("bb-unlocked", { detail: { pw: $("pw").value, inbox: DATA.inbox || [] } }));
 }
 
 $("leagues").addEventListener("click", e => { if (e.target.tagName === "BUTTON") { LEAGUE = e.target.textContent; draw(); } });
@@ -227,6 +267,78 @@ fetch("testing.json", { cache: "no-store" }).then(r => r.json()).then(f => {
   FILE = f;
   if (!f.data) { $("pw").disabled = $("go").disabled = true; $("err").textContent = "Not set up yet: add TESTING_PASSWORD to .env, then run python3 publish.py."; $("err").hidden = false; }
 }).catch(() => { $("err").textContent = "Couldn't load. Refresh in a minute."; $("err").hidden = false; });
+</script>
+<script type="module">
+// v114: 📍 Post a Daily Pick. The pick is locked with your Testing password before it leaves the phone, saved in your
+// Firebase database (only your login is allowed to add one), and the bot posts it to Discord on its next check.
+import { app, auth } from "./session.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+const $ = id => document.getElementById(id);
+const esc = t => String(t ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+let PW = null, USER = null;
+const b64 = u8 => btoa(String.fromCharCode(...u8));
+
+async function lock(obj) {
+  const enc = new TextEncoder(), salt = crypto.getRandomValues(new Uint8Array(16)), iv = crypto.getRandomValues(new Uint8Array(12));
+  const base = await crypto.subtle.importKey("raw", enc.encode(PW), "PBKDF2", false, ["deriveKey"]);
+  const key = await crypto.subtle.deriveKey({ name: "PBKDF2", salt, iterations: 200000, hash: "SHA-256" }, base,
+    { name: "AES-GCM", length: 256 }, false, ["encrypt"]);
+  const data = new Uint8Array(await crypto.subtle.encrypt({ name: "AES-GCM", iv }, key, enc.encode(JSON.stringify(obj))));
+  return { v: 1, iter: 200000, salt: b64(salt), iv: b64(iv), data: b64(data) };
+}
+
+function shape() {                     // totals ask Over/Under and "either team"; moneyline has no line
+  const m = $("pf-market").value;
+  $("pf-ou").hidden = m !== "total";
+  $("pf-line").hidden = m === "moneyline";
+  $("pf-teamlab").textContent = m === "total" ? "Either team in the game" : "Team you're betting";
+}
+$("pf-market").addEventListener("change", shape);
+
+function ready() {
+  const on = !!(PW && USER);
+  $("pf-login").hidden = !PW || !!USER || !auth;
+  $("pf-go").disabled = !on;
+}
+
+function recent(list) {
+  if (!list || !list.length) return;
+  $("pf-recent").hidden = false;
+  $("pf-recent").innerHTML = list.slice(0, 5).map(e => `<li>${esc(e.text || "Pick")}<span>${esc(e.status)} · ${esc(new Date(e.when).toLocaleString(undefined, { weekday: "short", hour: "numeric", minute: "2-digit" }))}</span></li>`).join("");
+}
+
+function msg(t, ok) { $("pf-msg").textContent = t; $("pf-msg").className = "pf-msg " + (ok ? "ok" : "bad"); }
+
+$("pf").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const f = Object.fromEntries(new FormData($("pf")));
+  const odds = Number(f.odds), line = Number(f.line), stake = Number(f.stake || 0.25);
+  if (!f.team.trim()) return msg("Type the team.", false);
+  if (f.market !== "moneyline" && (f.line.trim() === "" || !isFinite(line))) return msg("Add the line, like -3.5 or 221.5.", false);
+  if (!isFinite(odds) || (odds > -100 && odds < 100)) return msg("Odds look wrong. Use American odds like -110 or +120.", false);
+  if (!(stake > 0 && stake <= 2)) return msg("Stake should be between 0.1 and 2 units.", false);
+  $("pf-go").disabled = true; msg("Sending…", true);
+  try {
+    const pick = { sport: f.sport, market: f.market, team: f.team.trim(), ou: f.ou, line: f.market === "moneyline" ? "" : line,
+                   odds, book: f.book, stake, why: f.why.trim() };
+    await addDoc(collection(getFirestore(app), "pickInbox"), { ...(await lock(pick)), created: serverTimestamp() });
+    msg("✅ Sent. Watch #daily-picks: it posts on the bot's next check (within a few minutes while it's running).", true);
+    $("pf").reset(); shape();
+  } catch (err) {
+    console.error(err);
+    msg(/permission/i.test(String(err && (err.code || err.message))) ? "Not allowed. Log in with your admin email, and make sure the database rule is set (python3 inbox.py rules)."
+                                                                : "Couldn't send. Check your connection and try again.", false);
+  } finally { ready(); }
+});
+
+window.addEventListener("bb-unlocked", (e) => {
+  PW = e.detail.pw;
+  if (!auth) return;                   // logins not set up: no form
+  $("pickform").hidden = false;
+  recent(e.detail.inbox); shape(); ready();
+});
+if (auth) onAuthStateChanged(auth, (u) => { USER = u; ready(); });
 </script>
 </body>
 </html>
