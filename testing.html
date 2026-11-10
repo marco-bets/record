@@ -183,7 +183,7 @@
         <label id="pf-line">Line<input name="line" placeholder="-3.5" autocomplete="off"></label>
         <label>Odds<input name="odds" placeholder="-110" autocomplete="off"></label>
         <label>Book<select name="book"><option value="fanduel">FanDuel</option><option value="draftkings">DraftKings</option></select></label>
-        <label>Stake (units)<input name="stake" value="0.25" autocomplete="off"></label>
+        <label>Stake: ½ to 1 (lean), 1 to 3 (confident)<input name="stake" placeholder="e.g. 1.5" inputmode="decimal" autocomplete="off"></label>
         <label class="wide">Why (1 to 2 lines, optional)<textarea name="why" maxlength="200" rows="2"></textarea></label>
       </div>
       <button class="btn" type="submit" id="pf-go">Post pick</button>
@@ -313,11 +313,12 @@ function msg(t, ok) { $("pf-msg").textContent = t; $("pf-msg").className = "pf-m
 $("pf").addEventListener("submit", async (e) => {
   e.preventDefault();
   const f = Object.fromEntries(new FormData($("pf")));
-  const odds = Number(f.odds), line = Number(f.line), stake = Number(f.stake || 0.25);
+  const odds = Number(f.odds), line = Number(f.line), stake = Number(f.stake);
   if (!f.team.trim()) return msg("Type the team.", false);
   if (f.market !== "moneyline" && (f.line.trim() === "" || !isFinite(line))) return msg("Add the line, like -3.5 or 221.5.", false);
   if (!isFinite(odds) || (odds > -100 && odds < 100)) return msg("Odds look wrong. Use American odds like -110 or +120.", false);
-  if (!(stake > 0 && stake <= 2)) return msg("Stake should be between 0.1 and 2 units.", false);
+  if (!f.stake.trim()) return msg("Choose your stake: ½ to 3 units.", false);
+  if (!(stake >= 0.5 && stake <= 3)) return msg("Stake should be between 0.5 and 3 units.", false);
   $("pf-go").disabled = true; msg("Sending…", true);
   try {
     const pick = { sport: f.sport, market: f.market, team: f.team.trim(), ou: f.ou, line: f.market === "moneyline" ? "" : line,
