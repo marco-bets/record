@@ -1,13 +1,13 @@
 {
  "name": "Book Buster",
- "updated": "2026-11-10T10:16:28-05:00",
+ "updated": "2026-11-11T11:17:09-05:00",
  "since": "2026-11-04",
  "record": {
-  "wins": 1,
+  "wins": 3,
   "losses": 0,
   "pushes": 0,
-  "units": 0.23,
-  "roi": 0.92
+  "units": 1.23,
+  "roi": 0.82
  },
  "bets": [
   {
@@ -23,6 +23,34 @@
    "stake": 0.25,
    "result": "win",
    "units": 0.23
+  },
+  {
+   "posted": "2026-11-10T13:14:29-05:00",
+   "start": "2026-11-10T19:00:00-05:00",
+   "group": "Daily pick",
+   "sport": "NHL",
+   "sent": true,
+   "bet": "Wild moneyline (-128)",
+   "book": "FanDuel",
+   "game": "Wild @ Canadiens",
+   "final": "2-1",
+   "stake": 1.0,
+   "result": "win",
+   "units": 0.78
+  },
+  {
+   "posted": "2026-11-10T07:00:09-05:00",
+   "start": "2026-11-10T20:00:00-05:00",
+   "group": "Daily pick",
+   "sport": "CBB",
+   "sent": true,
+   "bet": "Over 167.5 (-115)",
+   "book": "FanDuel",
+   "game": "Northern Kentucky Norse @ Saint Louis Billikens",
+   "final": "63-125",
+   "stake": 0.25,
+   "result": "win",
+   "units": 0.22
   }
  ],
  "retired": [
@@ -38,6 +66,7 @@
   }
  ],
  "leagues": [
-  "CBB"
+  "CBB",
+  "NHL"
  ]
 }
