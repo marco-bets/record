@@ -1,13 +1,13 @@
 {
  "name": "Book Buster",
- "updated": "2026-11-12T08:27:06-05:00",
+ "updated": "2026-11-13T01:40:02-05:00",
  "since": "2026-11-04",
  "record": {
   "wins": 4,
-  "losses": 1,
+  "losses": 2,
   "pushes": 0,
-  "units": 0.71,
-  "roi": 0.2367
+  "units": -0.29,
+  "roi": -0.0725
  },
  "bets": [
   {
@@ -76,6 +76,20 @@
    "book": "FanDuel",
    "game": "Warriors @ Rockets",
    "final": "108-115",
+   "stake": 1.0,
+   "result": "loss",
+   "units": -1.0
+  },
+  {
+   "posted": "2026-11-12T07:54:49-05:00",
+   "start": "2026-11-12T19:00:00-05:00",
+   "group": "Daily pick",
+   "sport": "CBB",
+   "sent": true,
+   "bet": "Under 138.5 (-105)",
+   "book": "FanDuel",
+   "game": "Canisius Golden Griffins @ Brown Bears",
+   "final": "86-81",
    "stake": 1.0,
    "result": "loss",
    "units": -1.0
