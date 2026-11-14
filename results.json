@@ -1,13 +1,13 @@
 {
  "name": "Book Buster",
- "updated": "2026-11-13T10:42:04-05:00",
+ "updated": "2026-11-14T01:16:55-05:00",
  "since": "2026-11-04",
  "record": {
-  "wins": 4,
-  "losses": 2,
+  "wins": 5,
+  "losses": 4,
   "pushes": 0,
-  "units": -0.29,
-  "roi": -0.0725
+  "units": -1.81,
+  "roi": -0.2785
  },
  "bets": [
   {
@@ -90,6 +90,48 @@
    "book": "FanDuel",
    "game": "Canisius Golden Griffins @ Brown Bears",
    "final": "86-81",
+   "stake": 1.0,
+   "result": "loss",
+   "units": -1.0
+  },
+  {
+   "posted": "2026-11-13T07:00:13-05:00",
+   "start": "2026-11-13T19:30:00-05:00",
+   "group": "Bet of the day",
+   "sport": "CBB",
+   "sent": true,
+   "bet": "Over 159.5 (-110)",
+   "book": "FanDuel",
+   "game": "South Dakota Coyotes @ Drake Bulldogs",
+   "final": "72-81",
+   "stake": 1.0,
+   "result": "loss",
+   "units": -1.0
+  },
+  {
+   "posted": "2026-11-13T18:00:27-05:00",
+   "start": "2026-11-13T20:00:00-05:00",
+   "group": "Daily pick",
+   "sport": "CBB",
+   "sent": true,
+   "bet": "Under 155.5 (-105)",
+   "book": "FanDuel",
+   "game": "Milwaukee Panthers @ TCU Horned Frogs",
+   "final": "64-76",
+   "stake": 0.5,
+   "result": "win",
+   "units": 0.48
+  },
+  {
+   "posted": "2026-11-13T07:00:14-05:00",
+   "start": "2026-11-13T20:45:00-05:00",
+   "group": "Daily pick",
+   "sport": "CBB",
+   "sent": true,
+   "bet": "Over 154.5 (-110)",
+   "book": "FanDuel",
+   "game": "Lindenwood Lions @ Omaha Mavericks",
+   "final": "56-67",
    "stake": 1.0,
    "result": "loss",
    "units": -1.0
