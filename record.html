@@ -84,7 +84,7 @@
   .res { grid-row: 1 / span 2; grid-column: 2; text-align: right; }
   .pill { display: inline-block; font-size: .72rem; font-weight: 800; letter-spacing: .04em; padding: 4px 9px; border-radius: 999px; }
   .win .pill { color: var(--win); background: var(--win-soft); } .loss .pill { color: var(--loss); background: var(--loss-soft); }
-  .push .pill { color: var(--muted); background: var(--soft); }
+  .push .pill, .void .pill { color: var(--muted); background: var(--soft); }
   .u { display: block; font-weight: 800; font-size: 1.05rem; margin-top: 4px; }
   .win .u { color: var(--win); } .loss .u { color: var(--loss); } .push .u { color: var(--muted); }
   .empty { color: var(--muted); margin: 0; }
@@ -126,7 +126,7 @@ const wl = g => [g.filter(b => b.result === "win").length, g.filter(b => b.resul
 const cls = v => v == null ? "" : v > 0 ? "pos" : v < 0 ? "neg" : "";
 function record(bets) {
   const [w, l] = wl(bets), p = bets.filter(b => b.result === "push").length;
-  const risked = bets.filter(b => b.result !== "push").reduce((s, b) => s + b.stake, 0);
+  const risked = bets.filter(b => b.result === "win" || b.result === "loss").reduce((s, b) => s + b.stake, 0);
   const units = bets.reduce((s, b) => s + b.units, 0);
   return { wins: w, losses: l, pushes: p, units, roi: risked ? units / risked : null };
 }
@@ -178,10 +178,11 @@ function draw() {
       const s = dt(b.start), p = dt(b.posted);
       return `<li class="slip ${b.result}">
         <div class="what">${esc(b.bet)}<span class="tag">${esc(b.sport)}</span></div>
-        <div class="res"><span class="pill">${b.result === "win" ? "WON" : b.result === "loss" ? "LOST" : "PUSH"}</span><span class="u">${fmtU(b.units)}</span></div>
+        <div class="res"><span class="pill">${b.result === "win" ? "WON" : b.result === "loss" ? "LOST" : b.result === "void" ? "WITHDRAWN" : "PUSH"}</span><span class="u">${b.result === "void" ? "not counted" : fmtU(b.units)}</span></div>
         <div class="sub">${esc(b.game)} · Final ${esc(b.final)}</div>
         <div class="sub">${esc(b.group)} · ${esc(b.book)} · ${b.stake === 1 ? "1 unit" : b.stake + " units"}</div>
-        <div class="sub">Posted ${day(p)} ${time(p)} · Started ${time(s)}</div></li>`;
+        <div class="sub">Posted ${day(p)} ${time(p)} · Started ${time(s)}</div>${b.result === "void" ? `
+        <div class="sub">Withdrawn before tip after the line moved against it${b.was === "win" ? " (would have won)" : b.was === "loss" ? " (would have lost)" : ""}.</div>` : ""}</li>`;
     }).join("");
   };
   f.addEventListener("click", e => {
