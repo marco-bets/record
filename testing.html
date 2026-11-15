@@ -236,6 +236,14 @@ function draw() {
         <div class="sub">${esc(b.game)} · ${day(s)} ${time(s)} · ${esc(b.group)} · ${esc(b.book)}${b.ev != null ? ` · edge ${(b.ev * 100).toFixed(1)}%` : ""}</div>
         <div class="note">${esc(b.note)}</div></li>`; }).join("")}</ol>`
         : `<p class="empty">Nothing waiting right now. New tracked picks show up here within about 10 minutes.</p>`}</section>
+    ${(DATA.backtests || []).length ? `<section class="card" style="margin-top:14px"><h2>📼 Backtests on last season</h2>
+      <p class="meta" style="margin:0 0 6px">Last season's real odds, run through today's rules. Beating the closing line is the best sign of a real edge.</p>
+      ${DATA.backtests.map(t => t.rows ? `<h3 style="margin:14px 0 4px;font-size:1rem">${esc(t.title)}</h3><div class="tlist" role="table">
+        <div class="trow head"><span class="nm">Rules</span><span class="n">Picks</span><span class="n">Beat close</span><span class="n">Record</span><span class="n">Units</span></div>
+        ${t.rows.map(r => `<div class="trow"><span class="nm">${esc(r.name)}</span><span class="n"><small>Picks</small>${r.picks}</span>
+          <span class="n"><small>Beat close</small>${r.beat != null ? Math.round(r.beat * 100) + "%" : "n/a"}</span>
+          <span class="n"><small>Record</small>${r.wins}-${r.losses}</span><span class="n ${r.units > 0 ? "pos" : r.units < 0 ? "neg" : ""}"><small>Units</small>${fmtU(r.units)}</span></div>`).join("")}</div>`
+        : `<h3 style="margin:14px 0 4px;font-size:1rem">${esc(t.title)}</h3><pre style="white-space:pre-wrap;margin:0;font:13px/1.5 ui-monospace,monospace">${esc(t.text)}</pre>`).join("")}</section>` : ""}
     <section class="card" style="margin-top:14px"><h2>Proving progress</h2><div class="prog">${DATA.progress.map(p =>
       `<div class="row"><b>${esc(p.name)}<span class="state ${esc(p.state)}">${p.state === "SENDING" ? "SENDING" : "TESTING"}</span></b><span>${esc(p.detail)}</span></div>`).join("")}</div></section>
     <section class="card" style="margin-top:14px"><h2>By type (tracked silently)</h2>
