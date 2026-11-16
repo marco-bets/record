@@ -230,8 +230,14 @@ function draw() {
       `${cell("Win rate", w + l ? Math.round(w / (w + l) * 100) + "%" : "n/a")}${cell("Units", fmtU(u), u > 0 ? "pos" : u < 0 ? "neg" : "")}${cell("Pending", p)}</div>` };
   }).sort((a, b) => b.u - a.u).map(r => r.html).join("");   // best first
   const up = (DATA.upcoming || []).filter(b => LEAGUE === "All" || b.sport === LEAGUE);
+  const pb = DATA.playbook || [];
   $("view").innerHTML = `
-    <section class="card"><h2>🟢 Up next: tracked picks you can still bet</h2>
+    ${pb.length ? `<section class="card"><h2>✅ Playbook: proven plays</h2>
+      <p class="meta" style="margin:0 0 6px">Passed years of history. Silent ones go public on their own once their live record confirms it.</p>
+      <div class="prog">${pb.map(p => `<div class="row"><b>${esc(p.name)}<span class="state ${p.status === "PUBLIC" ? "SENDING" : ""}">${esc(p.status)}</span></b>
+        <span>Live ${esc(p.unit)}: ${esc(p.live)}${p.rate != null ? ` (${Math.round(p.rate * 100)}%)` : ""}, ${fmtU(p.units)} · this season ${esc(p.season)} · ${esc(p.detail)}</span>
+        <span class="meta">Backtest: ${esc(p.backtest)}</span></div>`).join("")}</div></section>` : ""}
+    <section class="card" style="margin-top:14px"><h2>🟢 Up next: tracked picks you can still bet</h2>
       <p class="meta" style="margin:0 0 6px">Still in testing, not proven yet. Bet them only if you want to, at the line shown or better.</p>
       ${up.length ? `<ol class="ledger">${up.map(b => { const s = dt(b.start); return `<li class="slip pending">
         <div class="what">${esc(b.bet)}<span class="tag">${esc(b.sport)}</span></div>
