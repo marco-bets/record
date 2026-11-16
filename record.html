@@ -110,7 +110,7 @@
   <p class="meta" id="retired" hidden></p>
   <footer>
     Every pick sent to members, graded when the game ends. Wins and losses both stay up; nothing gets deleted.
-    A unit is whatever amount you choose to bet; results are in units so they fit any bankroll.
+    A unit is whatever amount you choose to bet; results are in units so they fit any bankroll. Dollar amounts assume the unit size shown.
     Past results don't guarantee future results. For entertainment only, not financial advice. 21+ where legal. Need help? 1-800-GAMBLER.
   </footer>
 </main>
@@ -131,6 +131,17 @@ function record(bets) {
   return { wins: w, losses: l, pushes: p, units, roi: risked ? units / risked : null };
 }
 let DATA, LEAGUE = "All";
+const fmtD = (u, du) => (u >= 0 ? "+" : "−") + "$" + Math.round(Math.abs(u * du)).toLocaleString();
+function hl(bets) {   // v160: streaks and the biggest hit, from the same list (every loss included)
+  const g = bets.filter(b => b.result === "win" || b.result === "loss");
+  let k = null, n = 0;
+  for (let i = g.length - 1; i >= 0; i--) { if (k === null) k = g[i].result; if (g[i].result !== k) break; n++; }
+  const t = g.slice(-10), w10 = t.filter(b => b.result === "win").length;
+  let best = 0, run = 0;
+  for (const b of g) { run = b.result === "win" ? run + 1 : 0; best = Math.max(best, run); }
+  const big = bets.filter(b => b.result === "win").reduce((m, b) => !m || b.units > m.units ? b : m, null);
+  return { k, n, w10, l10: t.length - w10, best, big };
+}
 
 function leagues() {
   const el = document.getElementById("leagues");
@@ -145,7 +156,8 @@ function draw() {
     view.innerHTML = `<section class="card"><p class="empty">No finished ${LEAGUE === "All" ? "" : esc(LEAGUE) + " "}picks yet. Results show up the night each game ends.</p></section>`;
     return;
   }
-  const r = record(bets);
+  const r = record(bets), h = hl(bets), du = (DATA.highlights || {}).dollar_unit || 0, bu = (DATA.highlights || {}).bank_units || 100;
+  const bpct = u => (u >= 0 ? "+" : "−") + Math.abs(u / bu * 100).toFixed(0) + "%";
   let run = 0; const pts = [0, ...bets.map(b => (run += b.units))];
   const lo = Math.min(0, ...pts), hi = Math.max(0, ...pts), span = (hi - lo) || 1;
   const x = i => (i / (pts.length - 1)) * 790 + 5, y = v => 162 - ((v - lo) / span) * 152;
@@ -161,6 +173,11 @@ function draw() {
       <div class="stat"><span>Record</span><b>${r.wins}-${r.losses}${r.pushes ? "-" + r.pushes : ""}</b></div>
       <div class="stat"><span>Units</span><b class="${cls(r.units)}">${fmtU(r.units)}</b></div>
       <div class="stat"><span>Return per unit</span><b class="${cls(r.roi)}">${r.roi == null ? "n/a" : pct(r.roi)}</b></div></div></section>
+    <section class="card"><h2>📈 If you tailed every pick</h2><div class="summary">
+      <div class="stat"><span>On a ${bu}-unit bankroll</span><b class="${cls(r.units)}">${bpct(r.units)}</b></div>
+      <div class="stat"><span>Streak now</span><b>${h.k ? (h.k === "win" ? "W" : "L") + h.n : "n/a"}</b></div>
+      <div class="stat"><span>Last ${h.w10 + h.l10}</span><b>${h.w10}-${h.l10}</b></div></div>
+      <p class="meta">1 unit = 1% of a ${bu}-unit bankroll${du ? ` · ${fmtD(r.units, du)} at $${du.toLocaleString()} a unit` : ""}${h.big ? ` · Biggest hit: ${esc(h.big.bet)} ${fmtU(h.big.units)} · Longest win streak: W${h.best}` : ""}</p></section>
     <section class="card chart"><h2>Units over time</h2>
       <svg viewBox="0 0 800 170" preserveAspectRatio="none" role="img" aria-label="Running units won">
       <line x1="0" x2="800" y1="${y(0)}" y2="${y(0)}" stroke="#c9d2de" stroke-dasharray="4 5"/>
